@@ -70,6 +70,10 @@ export type User = {
   password: string;
 };
 
+export type CarouselProps = {
+  photos: string[];
+};
+
 /// old app code
 /* 
 

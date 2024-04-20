@@ -1,6 +1,7 @@
 import { fetchFilteredPlaces } from '@/app/lib/data';
 import { PhotoIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import CarouselFullsize from '../carousel-fullsize';
 
 export default async function PlacesTable({
   query,
@@ -14,10 +15,6 @@ export default async function PlacesTable({
   };
 
   const places = await fetchFilteredPlaces(query, currentPage);
-
-  const onViewPhotosClick = (photos: string[]) => {
-    console.log('View photos for place with photos:', photos);
-  };
 
   return (
     <div className="mt-6 flow-root overflow-x-scroll">
@@ -97,9 +94,7 @@ export default async function PlacesTable({
                     {place.name}
                   </td>
                   <td className="px-3 py-3 text-left align-top">
-                    {/* <button onClick={() =>onViewPhotosClick(place.photos)}> */}
-                    <PhotoIcon className="h-5 w-5 cursor-pointer text-gray-400" />
-                    {/*  </button> */}
+                    <CarouselFullsize photos={place.photos} />
                   </td>
                   <td className="px-3 py-3 text-left align-top">
                     {place.address}
