@@ -63,14 +63,16 @@ export type PlacesTable = {
   date?: string; // Puede que necesites ajustar el tipo de este campo dependiendo del formato de fecha que uses en tu base de datos
 };
 
-/// old app code
-
 export type User = {
   id: string;
   name: string;
   email: string;
   password: string;
 };
+
+/// old app code
+/* 
+
 
 export type Customer = {
   id: string;
@@ -149,3 +151,4 @@ export type InvoiceForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+ */

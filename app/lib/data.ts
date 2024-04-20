@@ -1,17 +1,17 @@
 import { sql } from '@vercel/postgres';
 import {
-  CustomerField,
+/*   CustomerField,
   CustomersTableType,
   InvoiceForm,
   InvoicesTable,
-  LatestInvoiceRaw,
+  LatestInvoiceRaw, */
   User,
-  Revenue,
+/*   Revenue, */
   Category,
   Subcategory,
   PlacesTable,
 } from './definitions';
-import { formatCurrency } from './utils';
+/* import { formatCurrency } from './utils'; */
 import { unstable_noStore as noStore } from 'next/cache';
 
 export const fetchCategoriesData = async () => {
@@ -121,7 +121,7 @@ export async function fetchFilteredPlaces(query: string, currentPage: number) {
 
 /////OLD APP DATA
 
-export async function fetchRevenue() {
+/* export async function fetchRevenue() {
   // Add noStore() here to prevent the response from being cached.
   // This is equivalent to in fetch(..., {cache: 'no-store'}).
   noStore();
@@ -344,7 +344,7 @@ export async function fetchFilteredCustomers(query: string) {
     return [];
     //throw new Error('Failed to fetch customer table.');
   }
-}
+} */
 
 export async function getUser(email: string) {
   try {
