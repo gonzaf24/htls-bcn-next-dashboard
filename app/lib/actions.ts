@@ -2,10 +2,12 @@
 
 import { z } from 'zod';
 import { sql } from '@vercel/postgres';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, unstable_noStore } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
+import { unstable_noStore as noStore } from 'next/cache';
+import { PlacesTable } from './definitions';
 
 const FormSchema = z.object({
   id: z.string(),
@@ -58,7 +60,7 @@ export async function createInvoice(prevState: State, formData: FormData) {
   // Insert data into the database
   try {
     await sql`
-      INSERT INTO invoices (customer_id, amount, status, date)
+      INSERT INTO places (customer_id, amount, status, date)
       VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
     `;
   } catch (error) {
@@ -68,9 +70,9 @@ export async function createInvoice(prevState: State, formData: FormData) {
     };
   }
 
-  // Revalidate the cache for the invoices page and redirect the user.
-  revalidatePath('/dashboard/invoices');
-  redirect('/dashboard/invoices');
+  // Revalidate the cache for the places page and redirect the user.
+  revalidatePath('/dashboard/places');
+  redirect('/dashboard/places');
 }
 
 export async function updateInvoice(
@@ -96,7 +98,7 @@ export async function updateInvoice(
 
   try {
     await sql`
-      UPDATE invoices
+      UPDATE places
       SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
       WHERE id = ${id}
     `;
@@ -104,16 +106,16 @@ export async function updateInvoice(
     return { message: 'Database Error: Failed to Update Invoice.' };
   }
 
-  revalidatePath('/dashboard/invoices');
-  redirect('/dashboard/invoices');
+  revalidatePath('/dashboard/places');
+  redirect('/dashboard/places');
 }
 
 export async function deleteInvoice(id: string) {
   // throw new Error('Failed to Delete Invoice');
 
   try {
-    await sql`DELETE FROM invoices WHERE id = ${id}`;
-    revalidatePath('/dashboard/invoices');
+    await sql`DELETE FROM places WHERE id = ${id}`;
+    revalidatePath('/dashboard/places');
     return { message: 'Deleted Invoice' };
   } catch (error) {
     return { message: 'Database Error: Failed to Delete Invoice.' };
@@ -136,5 +138,62 @@ export async function authenticate(
       }
     }
     throw error;
+  }
+}
+
+////NEW APP
+
+const ITEMS_PER_PAGE = 6;
+
+export async function fetchFilteredPlaces(query: string, currentPage: number) {
+  noStore();
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const places = await sql`
+      SELECT
+        p.id,
+        p.name,
+        p.address,
+        p.city,
+        p.photos,
+        p.instagram,
+        p.official_url,
+        p.description_es,
+        p.description_en,
+        p.trick_es,
+        p.trick_en,
+        p.booking_es,
+        p.booking_en,
+        p.active,
+        p.lat,
+        p.lng,
+        c.icon as category_icon,
+        s.icon as subcategory_icon,
+        c.t_name as category_name,
+        s.t_name as subcategory_name
+      FROM places p
+      LEFT JOIN categories c ON c.id = ANY(p.categories)
+      LEFT JOIN subcategories s ON s.id = ANY(p.subcategories)
+      WHERE
+        p.id::text ILIKE ${`%${query}%`} OR
+        p.name ILIKE ${`%${query}%`} OR
+        p.address ILIKE ${`%${query}%`} OR
+        p.city ILIKE ${`%${query}%`} OR
+        p.instagram ILIKE ${`%${query}%`} OR
+        p.official_url ILIKE ${`%${query}%`} OR
+        p.description_es ILIKE ${`%${query}%`} OR
+        p.description_en ILIKE ${`%${query}%`} OR
+        p.trick_es ILIKE ${`%${query}%`} OR
+        p.trick_en ILIKE ${`%${query}%`} 
+      ORDER BY p.name ASC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return places.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+    //throw new Error('Failed to fetch places.');
   }
 }

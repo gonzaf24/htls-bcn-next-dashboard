@@ -2,6 +2,69 @@
 // It describes the shape of the data, and what data type each property should accept.
 // For simplicity of teaching, we're manually defining these types.
 // However, these types are generated automatically if you're using an ORM such as Prisma.
+
+export type Category = {
+  id: number;
+  name: string;
+  t_name: string;
+  icon: string;
+};
+
+export type Subcategory = {
+  id: number;
+  category_id: number;
+  name: string;
+  t_name: string;
+  icon: string;
+};
+
+export type FormattedCategoriesTable = {
+  id: number;
+  name: string;
+  t_name: string;
+  icon: string;
+};
+
+export type FormattedSucategoriesTable = {
+  id: number;
+  category_id: number;
+  name: string;
+  t_name: string;
+  icon: string;
+};
+
+export type PlacesTable = {
+  id: number;
+  categories: number[];
+  subcategories: number[];
+  name: string;
+  photos: string[];
+  lat: number;
+  lng: number;
+  description_es: string;
+  description_en: string;
+  categoryIcon: string;
+  subcategoryIcon: string;
+  categoryName: string;
+  subcategoryName: string;
+  address?: string;
+  phones?: string[];
+  booking_es?: string[];
+  booking_en?: string[];
+  trick_es?: string[];
+  trick_en?: string[];
+  city?: string;
+  instagram?: string;
+  avgPrice?: string;
+  googleMapLink?: string;
+  official_url?: string;
+  active?: boolean;
+  lastUpdate?: string; // Puede que necesites ajustar el tipo de este campo dependiendo del formato de fecha que uses en tu base de datos
+  date?: string; // Puede que necesites ajustar el tipo de este campo dependiendo del formato de fecha que uses en tu base de datos
+};
+
+/// old app code
+
 export type User = {
   id: string;
   name: string;

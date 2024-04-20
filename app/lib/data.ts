@@ -7,9 +7,119 @@ import {
   LatestInvoiceRaw,
   User,
   Revenue,
+  Category,
+  Subcategory,
+  PlacesTable,
 } from './definitions';
 import { formatCurrency } from './utils';
 import { unstable_noStore as noStore } from 'next/cache';
+
+export const fetchCategoriesData = async () => {
+  noStore();
+  try {
+    const data = await sql`SELECT * FROM categories`;
+    return data.rows as Category[];
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+  }
+};
+
+export async function fetchSubcategoriesData() {
+  noStore();
+  try {
+    const data = await sql`SELECT * FROM subcategories`;
+    return data.rows as Subcategory[];
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+  }
+}
+
+export async function fetchPlacesPages(query: string) {
+  noStore();
+  try {
+    const count = await sql`
+  SELECT COUNT(*)
+  FROM places
+  WHERE
+    CAST(places.id AS TEXT) ILIKE ${`%${query}%`} OR
+    places.name ILIKE ${`%${query}%`} OR
+    places.address ILIKE ${`%${query}%`} OR
+    places.city ILIKE ${`%${query}%`} OR
+    places.instagram ILIKE ${`%${query}%`} OR
+    places.official_url ILIKE ${`%${query}%`} OR
+    places.description_es ILIKE ${`%${query}%`} OR
+    places.description_en ILIKE ${`%${query}%`} OR
+    places.trick_es ILIKE ${`%${query}%`} OR
+    places.trick_en ILIKE ${`%${query}%`} 
+  `;
+
+    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return 0;
+    //throw new Error('Failed to fetch total number of invoices.');
+  }
+}
+
+const ITEMS_PER_PAGE = 6;
+
+export async function fetchFilteredPlaces(query: string, currentPage: number) {
+  noStore();
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const places = await sql<PlacesTable>`
+      SELECT
+        p.id,
+        p.name,
+        p.address,
+        p.city,
+        p.photos,
+        p.instagram,
+        p.official_url,
+        p.description_es,
+        p.description_en,
+        p.trick_es,
+        p.trick_en,
+        p.booking_es,
+        p.booking_en,
+        p.active,
+        p.lat,
+        p.lng,
+        c.icon as category_icon,
+        s.icon as subcategory_icon,
+        c.t_name as category_name,
+        s.t_name as subcategory_name
+      FROM places p
+      LEFT JOIN categories c ON c.id = ANY(p.categories)
+      LEFT JOIN subcategories s ON s.id = ANY(p.subcategories)
+      WHERE
+        CAST(p.id AS TEXT) ILIKE ${`%${query}%`} OR
+        p.name ILIKE ${`%${query}%`} OR
+        p.address ILIKE ${`%${query}%`} OR
+        p.city ILIKE ${`%${query}%`} OR
+        p.instagram ILIKE ${`%${query}%`} OR
+        p.official_url ILIKE ${`%${query}%`} OR
+        p.description_es ILIKE ${`%${query}%`} OR
+        p.description_en ILIKE ${`%${query}%`} OR
+        p.trick_es ILIKE ${`%${query}%`} OR
+        p.trick_en ILIKE ${`%${query}%`} 
+      ORDER BY p.name ASC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    return places.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+    //throw new Error('Failed to fetch places.');
+  }
+}
+
+/////OLD APP DATA
 
 export async function fetchRevenue() {
   // Add noStore() here to prevent the response from being cached.
@@ -86,12 +196,16 @@ export async function fetchCardData() {
     };
   } catch (error) {
     console.error('Database Error:', error);
-    return { numberOfCustomers: 0, numberOfInvoices: 0, totalPaidInvoices: 0, totalPendingInvoices: 0 };
+    return {
+      numberOfCustomers: 0,
+      numberOfInvoices: 0,
+      totalPaidInvoices: 0,
+      totalPendingInvoices: 0,
+    };
     //throw new Error('Failed to fetch card data.');
   }
 }
 
-const ITEMS_PER_PAGE = 6;
 export async function fetchFilteredInvoices(
   query: string,
   currentPage: number,
