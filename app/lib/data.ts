@@ -119,6 +119,17 @@ export async function fetchFilteredPlaces(query: string, currentPage: number) {
   }
 }
 
+export async function getCategoriesMaxId() {
+  try {
+    const data = await sql`SELECT MAX(id) FROM categories`;
+    return data.rows[0].max;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return 0;
+  }
+}
+
+
 /////OLD APP DATA
 
 /* export async function fetchRevenue() {

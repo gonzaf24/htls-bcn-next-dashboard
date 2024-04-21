@@ -1,5 +1,6 @@
 import { FormattedCategoriesTable } from '@/app/lib/definitions';
 import Link from 'next/link';
+import { DeleteCategory } from './delete-form';
 
 export default async function CategoriesTable({
   categories,
@@ -64,9 +65,10 @@ export default async function CategoriesTable({
                         >
                           Edit
                         </Link>
-                        <button className="text-red-600 hover:text-red-900">
+                        <DeleteCategory id={category.id} />
+                        {/* <button className="text-red-600 hover:text-red-900">
                           Delete
-                        </button>
+                        </button> */}
                       </td>
                     </tr>
                   ))}

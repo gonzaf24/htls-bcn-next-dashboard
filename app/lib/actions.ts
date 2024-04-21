@@ -1,5 +1,4 @@
 'use server';
-
 import { z } from 'zod';
 import { sql } from '@vercel/postgres';
 import { revalidatePath, unstable_noStore } from 'next/cache';
@@ -7,7 +6,6 @@ import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { unstable_noStore as noStore } from 'next/cache';
-import { PlacesTable } from './definitions';
 
 const FormSchema = z.object({
   id: z.string(),
@@ -23,15 +21,32 @@ const FormSchema = z.object({
   date: z.string(),
 });
 
+const FormCategorySchema = z.object({
+  id: z.string().nonempty({
+    message: 'Please enter an id.',
+  }),
+  name: z.string().nonempty({
+    message: 'Please enter a name like: Bar',
+  }),
+  t_name: z.string().nonempty({
+    message: 'Please enter a translation name like: cat_bar',
+  }),
+  icon: z.string().nonempty({
+    message: 'Please enter an icon name like: bar.svg',
+  }),
+});
+
+const CreateCategory = FormCategorySchema.omit({  });
 const CreateInvoice = FormSchema.omit({ id: true, date: true });
 const UpdateInvoice = FormSchema.omit({ date: true, id: true });
 
 // This is temporary
 export type State = {
   errors?: {
-    customerId?: string[];
-    amount?: string[];
-    status?: string[];
+    id?: string[];
+    name?: string[];
+    t_name?: string[];
+    icon?: string[];
   };
   message?: string | null;
 };
@@ -48,7 +63,7 @@ export async function createInvoice(prevState: State, formData: FormData) {
   if (!validatedFields.success) {
     return {
       errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Create Invoice.',
+      message: 'Missing Fields. Failed to Create Category.',
     };
   }
 
@@ -195,5 +210,57 @@ export async function fetchFilteredPlaces(query: string, currentPage: number) {
     console.error('Database Error:', error);
     return [];
     //throw new Error('Failed to fetch places.');
+  }
+}
+
+
+export async function createCategory(prevState: State, formData: FormData) {
+  // Validate form fields using Zod
+  const validatedFields = CreateCategory.safeParse({
+    id: formData.get('id'),
+    name : formData.get('name'),
+    t_name: formData.get('t_name'),
+    icon: formData.get('icon'),
+  });
+
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Category.',
+    };
+  }
+
+  // Prepare data for insertion into the database
+  const { id, name, t_name, icon } = validatedFields.data;
+ 
+  // Insert data into the database
+  try {
+    await sql`
+      INSERT INTO categories (id, name, t_name, icon)
+      VALUES (${id}, ${name}, ${t_name}, ${icon})
+    `;
+  } catch (error) {
+    // If a database error occurs, return a more specific error.
+    return {
+      message: 'Database Error: Failed to Create Invoice.',
+    };
+  }
+
+  // Revalidate the cache for the places page and redirect the user.
+  revalidatePath('/dashboard');
+  redirect('/dashboard');
+}
+
+
+export async function deleteCategory(id: number) {
+  // throw new Error('Failed to Delete category');
+
+  try {
+    await sql`DELETE FROM categories WHERE id = ${id}`;
+    revalidatePath('/dashboard');
+    return { message: 'Category deleted' };
+  } catch (error) {
+    return { message: 'Database Error: Failed to Delete Category.' };
   }
 }

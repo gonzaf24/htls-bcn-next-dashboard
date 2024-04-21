@@ -1,14 +1,15 @@
-/* import { fetchCustomers } from '@/app/lib/data'; */
-import Form from '@/app/ui/invoices/create-form';
 import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
 import { Metadata } from 'next';
+import { getCategoriesMaxId } from '@/app/lib/data';
+import Form from '@/app/ui/category/create-form';
 
 export const metadata: Metadata = {
-  title: 'Create Invoice',
+  title: 'Create Category',
 };
 
 export default async function Page() {
-  /* const customers = await fetchCustomers(); */
+  const id = await getCategoriesMaxId();
+  const categoryId = id + 1;
 
   return (
     <main>
@@ -22,7 +23,7 @@ export default async function Page() {
           },
         ]}
       />
-      {/* <Form customers={customers} /> */}
+      <Form categoryId={categoryId} />
     </main>
   );
 }
