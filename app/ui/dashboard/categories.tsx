@@ -9,7 +9,10 @@ export default async function CategoriesWrapper() {
   return (
     <div className="mt-10 flex w-full flex-col gap-10">
       <CategoriesTable categories={categories} />
-      <SubcategoriesTable subcategories={subcategories} />
+      <SubcategoriesTable
+        categories={categories}
+        subcategories={subcategories}
+      />
     </div>
   );
 }

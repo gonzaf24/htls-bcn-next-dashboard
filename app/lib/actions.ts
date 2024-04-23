@@ -1,25 +1,12 @@
 'use server';
 import { z } from 'zod';
 import { sql } from '@vercel/postgres';
-import { revalidatePath, unstable_noStore } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { unstable_noStore as noStore } from 'next/cache';
-
-const FormSchema = z.object({
-  id: z.string(),
-  customerId: z.string({
-    invalid_type_error: 'Please select a customer.',
-  }),
-  amount: z.coerce
-    .number()
-    .gt(0, { message: 'Please enter an amount greater than $0.' }),
-  status: z.enum(['pending', 'paid'], {
-    invalid_type_error: 'Please select an invoice status.',
-  }),
-  date: z.string(),
-});
+import { Category } from './definitions';
 
 const FormCategorySchema = z.object({
   id: z.string().nonempty({
@@ -36,9 +23,42 @@ const FormCategorySchema = z.object({
   }),
 });
 
-const CreateCategory = FormCategorySchema.omit({  });
-const CreateInvoice = FormSchema.omit({ id: true, date: true });
-const UpdateInvoice = FormSchema.omit({ date: true, id: true });
+const FormSubcategorySchema = FormCategorySchema.extend({
+  id: z
+    .string()
+    .nonempty({
+      message: 'Please enter an id.',
+    })
+    .refine(
+      (value) => {
+        const id = parseInt(value);
+        return id !== 0;
+      },
+      {
+        message: 'ID cannot be zero.',
+      },
+    ),
+  categoryId: z.string().nonempty({
+    message: 'Please enter a categoryId.',
+  }),
+  name: z.string().nonempty({
+    message: 'Please enter a name like: Bar',
+  }),
+  t_name: z.string().nonempty({
+    message: 'Please enter a translation name like: cat_bar',
+  }),
+  icon: z.string().nonempty({
+    message: 'Please enter an icon name like: bar.svg',
+  }),
+});
+
+const CreateSubcategory = FormSubcategorySchema.omit({});
+const UpdateSubcategory = FormSubcategorySchema.omit({
+  id: true,
+  categoryId: true,
+});
+const CreateCategory = FormCategorySchema.omit({});
+const UpdateCategory = FormCategorySchema.omit({ id: true });
 
 // This is temporary
 export type State = {
@@ -50,113 +70,6 @@ export type State = {
   };
   message?: string | null;
 };
-
-export async function createInvoice(prevState: State, formData: FormData) {
-  // Validate form fields using Zod
-  const validatedFields = CreateInvoice.safeParse({
-    customerId: formData.get('customerId'),
-    amount: formData.get('amount'),
-    status: formData.get('status'),
-  });
-
-  // If form validation fails, return errors early. Otherwise, continue.
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Create Category.',
-    };
-  }
-
-  // Prepare data for insertion into the database
-  const { customerId, amount, status } = validatedFields.data;
-  const amountInCents = amount * 100;
-  const date = new Date().toISOString().split('T')[0];
-
-  // Insert data into the database
-  try {
-    await sql`
-      INSERT INTO places (customer_id, amount, status, date)
-      VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
-    `;
-  } catch (error) {
-    // If a database error occurs, return a more specific error.
-    return {
-      message: 'Database Error: Failed to Create Invoice.',
-    };
-  }
-
-  // Revalidate the cache for the places page and redirect the user.
-  revalidatePath('/dashboard/places');
-  redirect('/dashboard/places');
-}
-
-export async function updateInvoice(
-  id: string,
-  prevState: State,
-  formData: FormData,
-) {
-  const validatedFields = UpdateInvoice.safeParse({
-    customerId: formData.get('customerId'),
-    amount: formData.get('amount'),
-    status: formData.get('status'),
-  });
-
-  if (!validatedFields.success) {
-    return {
-      errors: validatedFields.error.flatten().fieldErrors,
-      message: 'Missing Fields. Failed to Update Invoice.',
-    };
-  }
-
-  const { customerId, amount, status } = validatedFields.data;
-  const amountInCents = amount * 100;
-
-  try {
-    await sql`
-      UPDATE places
-      SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
-      WHERE id = ${id}
-    `;
-  } catch (error) {
-    return { message: 'Database Error: Failed to Update Invoice.' };
-  }
-
-  revalidatePath('/dashboard/places');
-  redirect('/dashboard/places');
-}
-
-export async function deleteInvoice(id: string) {
-  // throw new Error('Failed to Delete Invoice');
-
-  try {
-    await sql`DELETE FROM places WHERE id = ${id}`;
-    revalidatePath('/dashboard/places');
-    return { message: 'Deleted Invoice' };
-  } catch (error) {
-    return { message: 'Database Error: Failed to Delete Invoice.' };
-  }
-}
-
-export async function authenticate(
-  prevState: string | undefined,
-  formData: FormData,
-) {
-  try {
-    await signIn('credentials', formData);
-  } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return 'Invalid credentials.';
-        default:
-          return 'Something went wrong.';
-      }
-    }
-    throw error;
-  }
-}
-
-////NEW APP
 
 const ITEMS_PER_PAGE = 6;
 
@@ -213,12 +126,11 @@ export async function fetchFilteredPlaces(query: string, currentPage: number) {
   }
 }
 
-
 export async function createCategory(prevState: State, formData: FormData) {
   // Validate form fields using Zod
   const validatedFields = CreateCategory.safeParse({
     id: formData.get('id'),
-    name : formData.get('name'),
+    name: formData.get('name'),
     t_name: formData.get('t_name'),
     icon: formData.get('icon'),
   });
@@ -233,7 +145,7 @@ export async function createCategory(prevState: State, formData: FormData) {
 
   // Prepare data for insertion into the database
   const { id, name, t_name, icon } = validatedFields.data;
- 
+
   // Insert data into the database
   try {
     await sql`
@@ -252,7 +164,6 @@ export async function createCategory(prevState: State, formData: FormData) {
   redirect('/dashboard');
 }
 
-
 export async function deleteCategory(id: number) {
   // throw new Error('Failed to Delete category');
 
@@ -262,5 +173,168 @@ export async function deleteCategory(id: number) {
     return { message: 'Category deleted' };
   } catch (error) {
     return { message: 'Database Error: Failed to Delete Category.' };
+  }
+}
+
+export async function updateCategory(
+  id: string,
+  prevState: State,
+  formData: FormData,
+) {
+  const validatedFields = UpdateCategory.safeParse({
+    id: formData.get('id'),
+    name: formData.get('name'),
+    t_name: formData.get('t_name'),
+    icon: formData.get('icon'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Update Category.',
+    };
+  }
+
+  const { name, t_name, icon } = validatedFields.data;
+
+  try {
+    await sql`
+      UPDATE categories
+      SET name = ${name}, t_name = ${t_name}, icon = ${icon}
+      WHERE id = ${id}
+    `;
+  } catch (error) {
+    return { message: 'Database Error: Failed to Update Category.' };
+  }
+
+  revalidatePath('/dashboard');
+  redirect('/dashboard');
+}
+
+export async function fetchCategories() {
+  noStore();
+  try {
+    const data = await sql`SELECT * FROM categories`;
+    return data.rows as Category[];
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+  }
+}
+
+export async function createSubcategory(prevState: State, formData: FormData) {
+  // Validate form fields using Zod
+  const validatedFields = CreateSubcategory.safeParse({
+    id: formData.get('id'),
+    categoryId: formData.get('category_id'),
+    name: formData.get('name'),
+    t_name: formData.get('t_name'),
+    icon: formData.get('icon'),
+  });
+
+  // If form validation fails, return errors early. Otherwise, continue.
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Subcategory.',
+    };
+  }
+
+  // Prepare data for insertion into the database
+  const { id, categoryId, name, t_name, icon } = validatedFields.data;
+
+  // Insert data into the database
+  try {
+    await sql`
+      INSERT INTO subcategories (id, category_id, name, t_name, icon)
+      VALUES (${id}, ${categoryId} , ${name}, ${t_name}, ${icon})
+    `;
+  } catch (error) {
+    // If a database error occurs, return a more specific error.
+    return {
+      message: 'Database Error: Failed to Create Invoice.',
+    };
+  }
+
+  // Revalidate the cache for the places page and redirect the user.
+  revalidatePath('/dashboard');
+  redirect('/dashboard');
+}
+
+export async function deleteSubcategory(id: number) {
+  // throw new Error('Failed to Delete category');
+
+  try {
+    await sql`DELETE FROM subcategories WHERE id = ${id}`;
+    revalidatePath('/dashboard');
+    return { message: 'Subcategory deleted' };
+  } catch (error) {
+    return { message: 'Database Error: Failed to Delete Subcategory.' };
+  }
+}
+
+export async function updateSubcategory(
+  id: number,
+  prevState: State,
+  formData: FormData,
+) {
+  const validatedFields = UpdateSubcategory.safeParse({
+    id: formData.get('id'),
+    categoryId: formData.get('category_id'),
+    name: formData.get('name'),
+    t_name: formData.get('t_name'),
+    icon: formData.get('icon'),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Update Subcategory.',
+    };
+  }
+
+  const { name, t_name, icon } = validatedFields.data;
+
+  try {
+    await sql`
+      UPDATE subcategories
+      SET name = ${name}, t_name = ${t_name}, icon = ${icon}
+      WHERE id = ${id}
+    `;
+  } catch (error) {
+    return { message: 'Database Error: Failed to Update Subcategory.' };
+  }
+
+  revalidatePath('/dashboard');
+  redirect('/dashboard');
+}
+
+export async function getSubcategoriesMaxId(categoryId: number) {
+  try {
+    const data =
+      await sql`SELECT MAX(id) FROM subcategories WHERE category_id=${categoryId}`;
+    return data.rows[0].max;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return 0;
+  }
+}
+
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    await signIn('credentials', formData);
+  } catch (error) {
+    if (error instanceof AuthError) {
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return 'Invalid credentials.';
+        default:
+          return 'Something went wrong.';
+      }
+    }
+    throw error;
   }
 }

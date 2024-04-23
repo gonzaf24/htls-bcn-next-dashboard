@@ -1,5 +1,5 @@
 'use client';
-import { deleteCategory } from '@/app/lib/actions';
+import { deleteSubcategory } from '@/app/lib/actions';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,17 +12,17 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
 
-export function DeleteCategory({ id }: { id: number }) {
+export function DeleteSubcategory({ id }: { id: number }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const deleteCategoryWithId = deleteCategory.bind(null, id);
+  const deleteSubcategoryWithId = deleteSubcategory.bind(null, id);
 
   const handleDelete = () => {
     setIsOpen(true); // Abrir el cuadro de diálogo de confirmación
   };
 
   const handleConfirmDelete = () => {
-    deleteCategoryWithId();
+    deleteSubcategoryWithId();
     setIsOpen(false); // Cerrar el cuadro de diálogo de confirmación
   };
 
@@ -37,7 +37,7 @@ export function DeleteCategory({ id }: { id: number }) {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Delete</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this category?
+              Are you sure you want to delete this subcategory?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

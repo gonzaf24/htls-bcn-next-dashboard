@@ -17,7 +17,7 @@ import { unstable_noStore as noStore } from 'next/cache';
 export const fetchCategoriesData = async () => {
   noStore();
   try {
-    const data = await sql`SELECT * FROM categories`;
+    const data = await sql`SELECT * FROM categories ORDER BY id ASC`;
     return data.rows as Category[];
   } catch (error) {
     console.error('Database Error:', error);
@@ -28,11 +28,22 @@ export const fetchCategoriesData = async () => {
 export async function fetchSubcategoriesData() {
   noStore();
   try {
-    const data = await sql`SELECT * FROM subcategories`;
+    const data = await sql`SELECT * FROM subcategories ORDER BY id ASC`;
     return data.rows as Subcategory[];
   } catch (error) {
     console.error('Database Error:', error);
     return [];
+  }
+}
+
+export async function fetchCategoryById(id: number) {
+  noStore();
+  try {
+    const data = await sql<Category>`SELECT * FROM categories WHERE id=${id}`;
+    return data.rows[0];
+  } catch (error) {
+    console.error('Database Error:', error);
+    return null;
   }
 }
 
@@ -129,6 +140,28 @@ export async function getCategoriesMaxId() {
   }
 }
 
+export async function fetchSubcategoryById(id: number) {
+  noStore();
+  try {
+    const data =
+      await sql<Subcategory>`SELECT * FROM subcategories WHERE id=${id}`;
+    return data.rows[0];
+  } catch (error) {
+    console.error('Database Error:', error);
+    return null;
+  }
+}
+
+export async function getSubcategoriesMaxId(categoryId: number) {
+  try {
+    const data =
+      await sql`SELECT MAX(id) FROM subcategories WHERE category_id=${categoryId}`;
+    return data.rows[0].max;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return 0;
+  }
+}
 
 /////OLD APP DATA
 

@@ -2,12 +2,17 @@
 
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
-import { createCategory } from '@/app/lib/actions';
+import { updateCategory } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
+import { Category } from '@/app/lib/definitions';
 
-export default function Form({ categoryId }: { categoryId: number }) {
+export default function Form({ category }: { category: Category }) {
   const initialState = { message: null, errors: {} };
-  const [state, dispatch] = useFormState(createCategory, initialState);
+  const updateCategoryWithId = updateCategory.bind(
+    null,
+    category.id.toString(),
+  );
+  const [state, dispatch] = useFormState(updateCategoryWithId, initialState);
 
   return (
     <form action={dispatch}>
@@ -25,8 +30,8 @@ export default function Form({ categoryId }: { categoryId: number }) {
               step="0.01"
               className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
               aria-describedby="id-error"
-              defaultValue={categoryId}
-              readOnly
+              defaultValue={category.id}
+              disabled
             />
           </div>
 
@@ -55,6 +60,7 @@ export default function Form({ categoryId }: { categoryId: number }) {
                 placeholder="Name"
                 className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
                 aria-describedby="name-error"
+                defaultValue={category.name}
               />
             </div>
           </div>
@@ -84,6 +90,7 @@ export default function Form({ categoryId }: { categoryId: number }) {
                 placeholder="Translation name"
                 className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
                 aria-describedby="t_name-error"
+                defaultValue={category.t_name}
               />
             </div>
           </div>
@@ -113,6 +120,7 @@ export default function Form({ categoryId }: { categoryId: number }) {
                 placeholder="Icon name"
                 className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
                 aria-describedby="icon-error"
+                defaultValue={category.icon}
               />
             </div>
           </div>
@@ -140,7 +148,7 @@ export default function Form({ categoryId }: { categoryId: number }) {
         >
           Cancel
         </Link>
-        <Button type="submit">Create Category</Button>
+        <Button type="submit">Update Category</Button>
       </div>
     </form>
   );

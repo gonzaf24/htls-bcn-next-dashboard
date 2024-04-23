@@ -1,11 +1,23 @@
-import { FormattedSucategoriesTable } from '@/app/lib/definitions';
+import {
+  FormattedCategoriesTable,
+  FormattedSucategoriesTable,
+} from '@/app/lib/definitions';
 import Link from 'next/link';
+import { useMemo } from 'react';
+import { DeleteSubcategory } from './delete-form';
 
 export default async function SubcategoriesTable({
+  categories,
   subcategories,
 }: {
+  categories: FormattedCategoriesTable[];
   subcategories: FormattedSucategoriesTable[];
 }) {
+  const getCategoryName = useMemo(() => {
+    return (id: number) =>
+      categories.find((category) => category.id === id)?.name;
+  }, [categories]);
+
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
@@ -24,11 +36,14 @@ export default async function SubcategoriesTable({
               <table className="min-w-full rounded-md text-gray-900 md:table">
                 <thead className="rounded-md bg-gray-50 text-left text-sm font-normal">
                   <tr>
+                    <th scope="col" className="px-3 py-5 font-medium">
+                      actions
+                    </th>
                     <th scope="col" className="px-4 py-5 font-medium ">
                       id
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
-                      category_id
+                      category
                     </th>
                     <th scope="col" className="px-3 py-5 font-medium">
                       name
@@ -39,20 +54,26 @@ export default async function SubcategoriesTable({
                     <th scope="col" className="px-3 py-5 font-medium">
                       icon
                     </th>
-                    <th scope="col" className="px-3 py-5 font-medium">
-                      actions
-                    </th>
                   </tr>
                 </thead>
 
                 <tbody className="divide-y divide-gray-200 text-gray-900">
                   {subcategories.map((subcategory) => (
                     <tr key={subcategory.id} className="group">
+                      <td className="flex gap-3 whitespace-nowrap bg-white px-4 py-5 text-sm">
+                        <Link
+                          href={`/dashboard/subcategory/${subcategory.id}/edit`}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          Edit
+                        </Link>
+                        <DeleteSubcategory id={subcategory.id} />
+                      </td>
                       <td className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6">
                         <p>{subcategory.id}</p>
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
-                        {subcategory.category_id}
+                        {getCategoryName(subcategory.category_id)}
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                         {subcategory.name}
@@ -62,17 +83,6 @@ export default async function SubcategoriesTable({
                       </td>
                       <td className="whitespace-nowrap bg-white px-4 py-5 text-sm">
                         {subcategory.icon}
-                      </td>
-                      <td className="flex gap-3 whitespace-nowrap bg-white px-4 py-5 text-sm">
-                        <Link
-                          href={`/dashboard/subcategory/${subcategory.id}/edit`}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          Edit
-                        </Link>
-                        <button className="text-red-600 hover:text-red-900">
-                          Delete
-                        </button>
                       </td>
                     </tr>
                   ))}
