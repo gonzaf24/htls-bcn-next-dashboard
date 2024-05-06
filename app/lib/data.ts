@@ -1,18 +1,13 @@
 import { sql } from '@vercel/postgres';
 import {
-  /*   CustomerField,
-  CustomersTableType,
-  InvoiceForm,
-  InvoicesTable,
-  LatestInvoiceRaw, */
   User,
-  /*   Revenue, */
   Category,
   Subcategory,
   PlacesTable,
+  UserTable,
 } from './definitions';
-/* import { formatCurrency } from './utils'; */
 import { unstable_noStore as noStore } from 'next/cache';
+import { mapPlaceDataToPlace } from './mapping-data';
 
 export const fetchCategoriesData = async () => {
   noStore();
@@ -82,9 +77,11 @@ export async function fetchFilteredPlaces(query: string, currentPage: number) {
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   try {
-    const places = await sql<PlacesTable>`
+    const data = await sql<PlacesTable>`
       SELECT
         p.id,
+        p.category_id,
+        p.subcategory_id,
         p.name,
         p.address,
         p.city,
@@ -100,13 +97,14 @@ export async function fetchFilteredPlaces(query: string, currentPage: number) {
         p.active,
         p.lat,
         p.lng,
+        p.last_update,
         c.icon as category_icon,
         s.icon as subcategory_icon,
-        c.t_name as category_name,
-        s.t_name as subcategory_name
+        c.name as category_name,
+        s.name as subcategory_name
       FROM places p
-      LEFT JOIN categories c ON c.id = ANY(p.categories)
-      LEFT JOIN subcategories s ON s.id = ANY(p.subcategories)
+      LEFT JOIN categories c ON c.id = p.category_id
+      LEFT JOIN subcategories s ON s.id = p.subcategory_id
       WHERE
         CAST(p.id AS TEXT) ILIKE ${`%${query}%`} OR
         p.name ILIKE ${`%${query}%`} OR
@@ -118,11 +116,14 @@ export async function fetchFilteredPlaces(query: string, currentPage: number) {
         p.description_en ILIKE ${`%${query}%`} OR
         p.trick_es ILIKE ${`%${query}%`} OR
         p.trick_en ILIKE ${`%${query}%`} 
-      ORDER BY p.name ASC
+      ORDER BY p.last_update DESC
       LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
     `;
 
-    return places.rows;
+    const places: PlacesTable[] = data.rows.map((row: PlacesTable) =>
+      mapPlaceDataToPlace(row),
+    );
+    return places;
   } catch (error) {
     console.error('Database Error:', error);
     return [];
@@ -152,6 +153,17 @@ export async function fetchSubcategoryById(id: number) {
   }
 }
 
+export async function getSubcategoriesByCategoryId(categoryId: number) {
+  try {
+    const data = await sql<Subcategory>`
+      SELECT * FROM subcategories WHERE category_id=${categoryId}`;
+    return data.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+  }
+}
+
 export async function getSubcategoriesMaxId(categoryId: number) {
   try {
     const data =
@@ -160,6 +172,133 @@ export async function getSubcategoriesMaxId(categoryId: number) {
   } catch (error) {
     console.error('Database Error:', error);
     return 0;
+  }
+}
+
+export async function getPlacesMaxId() {
+  try {
+    const data = await sql`SELECT MAX(id) FROM places`;
+    return data.rows[0].max;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return 0;
+  }
+}
+
+export async function fetchPlace(id: number) {
+  noStore();
+  try {
+    const data = await sql<PlacesTable>`
+      SELECT
+        p.id,
+        p.category_id,
+        p.subcategory_id,
+        p.name,
+        p.address,
+        p.city,
+        p.phones,
+        p.photos,
+        p.instagram,
+        p.official_url,
+        p.description_es,
+        p.description_en,
+        p.schedules_es,
+        p.schedules_en,
+        p.trick_es,
+        p.trick_en,
+        p.booking_es,
+        p.booking_en,
+        p.avg_price,
+        p.google_map_link,
+        p.active,
+        p.lat,
+        p.lng,
+        c.icon as category_icon,
+        s.icon as subcategory_icon,
+        c.t_name as category_name,
+        s.t_name as subcategory_name
+      FROM places p
+      LEFT JOIN categories c ON c.id = p.category_id
+      LEFT JOIN subcategories s ON s.id = p.subcategory_id
+      WHERE p.id=${id}
+    `;
+    const place = data.rows[0] ? mapPlaceDataToPlace(data.rows[0]) : null;
+    return place;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+  }
+}
+
+export async function fetchUsersPages(query: string) {
+  noStore();
+  try {
+    const count = await sql`
+  SELECT COUNT(*)
+  FROM users
+  WHERE
+    CAST(id AS TEXT) ILIKE ${`%${query}%`} OR
+    name ILIKE ${`%${query}%`} OR
+    email ILIKE ${`%${query}%`} OR
+  `;
+
+    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return 0;
+    //throw new Error('Failed to fetch total number of invoices.');
+  }
+}
+
+export async function fetchHtlsUsers(query: string, currentPage: number) {
+  noStore();
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+  try {
+    const data = await sql<UserTable>`
+      SELECT
+        id,
+        name,
+        email,
+        image,
+        date
+      FROM users
+      WHERE
+        CAST(id AS TEXT) ILIKE ${`%${query}%`} OR
+        name ILIKE ${`%${query}%`} OR
+        email ILIKE ${`%${query}%`}
+      ORDER BY date DESC
+      LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+    `;
+
+    const users: UserTable[] = data.rows;
+    return users;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+    //throw new Error('Failed to fetch places.');
+  }
+}
+
+export async function fetchDashboardUsers() {
+  noStore();
+  try {
+    const data = await sql<UserTable>`
+      SELECT
+        id,
+        name,
+        email,
+        role
+      FROM dashboard_users
+    `;
+
+    const users: UserTable[] = data.rows;
+    return users;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+    //throw new Error('Failed to fetch places.');
   }
 }
 

@@ -1,5 +1,5 @@
 const { db } = require('@vercel/postgres');
-const { users } = require('../app/lib/placeholder-data.js');
+const { users } = require('./placeholder-data_back.js');
 const bcrypt = require('bcrypt');
 
 async function seedUsers(client) {
@@ -11,6 +11,7 @@ async function seedUsers(client) {
         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         email TEXT NOT NULL UNIQUE,
+        role TEXT DEFAULT 'user' NOT NULL,
         password TEXT NOT NULL
       );
     `;
@@ -22,8 +23,8 @@ async function seedUsers(client) {
       users.map(async (user) => {
         const hashedPassword = await bcrypt.hash(user.password, 10);
         return client.sql`
-        INSERT INTO dashboard_users (id, name, email, password)
-        VALUES (${user.id}, ${user.name}, ${user.email}, ${hashedPassword})
+        INSERT INTO dashboard_users (name, email, role, password)
+        VALUES (${user.name}, ${user.email}, ${user.role}, ${hashedPassword})
         ON CONFLICT (id) DO NOTHING;
       `;
       }),

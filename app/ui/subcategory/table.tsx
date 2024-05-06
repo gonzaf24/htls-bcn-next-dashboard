@@ -1,6 +1,6 @@
 import {
   FormattedCategoriesTable,
-  FormattedSucategoriesTable,
+  FormattedSubcategoriesTable,
 } from '@/app/lib/definitions';
 import Link from 'next/link';
 import { useMemo } from 'react';
@@ -11,7 +11,7 @@ export default async function SubcategoriesTable({
   subcategories,
 }: {
   categories: FormattedCategoriesTable[];
-  subcategories: FormattedSucategoriesTable[];
+  subcategories: FormattedSubcategoriesTable[];
 }) {
   const getCategoryName = useMemo(() => {
     return (id: number) =>

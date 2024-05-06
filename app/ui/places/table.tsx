@@ -1,7 +1,9 @@
 import { fetchFilteredPlaces } from '@/app/lib/data';
-import { PhotoIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import CarouselFullsize from '../carousel-fullsize';
+import { DeletePlace } from './delete-form';
+import { PlacesTable as PlacesTableDef } from '@/app/lib/definitions';
+import { formatDateToLocal } from '@/app/lib/utils';
 
 export default async function PlacesTable({
   query,
@@ -14,8 +16,10 @@ export default async function PlacesTable({
     return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
   };
 
-  const places = await fetchFilteredPlaces(query, currentPage);
-
+  const places = (await fetchFilteredPlaces(
+    query,
+    currentPage,
+  )) as PlacesTableDef[];
   return (
     <div className="mt-6 flow-root overflow-x-scroll">
       <div className="inline-block min-w-full align-middle">
@@ -25,6 +29,12 @@ export default async function PlacesTable({
               <tr>
                 <th scope="col" className="px-4 py-5 font-medium">
                   Actions
+                </th>
+                <th scope="col" className="px-3 py-5 font-medium">
+                  Active
+                </th>
+                <th scope="col" className="px-4 py-5 font-medium">
+                  Category
                 </th>
                 <th scope="col" className="px-4 py-5 font-medium">
                   ID
@@ -47,10 +57,16 @@ export default async function PlacesTable({
                 <th scope="col" className="px-3 py-5 font-medium">
                   Official URL
                 </th>
-                <th scope="col" className="px-3 py-5 font-medium">
+                <th
+                  scope="col"
+                  className="whitespace-nowrap px-3 py-5 font-medium"
+                >
                   Description ES
                 </th>
-                <th scope="col" className="px-3 py-5 font-medium">
+                <th
+                  scope="col"
+                  className="whitespace-nowrap px-3 py-5 font-medium"
+                >
                   Description EN
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
@@ -60,13 +76,7 @@ export default async function PlacesTable({
                   Trick EN
                 </th>
                 <th scope="col" className="px-3 py-5 font-medium">
-                  Booking ES
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Booking EN
-                </th>
-                <th scope="col" className="px-3 py-5 font-medium">
-                  Active
+                  Last Updated
                 </th>
               </tr>
             </thead>
@@ -83,9 +93,18 @@ export default async function PlacesTable({
                     >
                       Edit
                     </Link>
-                    <button className="text-red-600 hover:text-red-900">
-                      Delete
-                    </button>
+                    <DeletePlace id={place.id} />
+                  </td>
+                  <td className="px-3 py-3 text-left align-top">
+                    <input
+                      type="checkbox"
+                      className="h-5 w-5"
+                      checked={place.active}
+                      readOnly
+                    />
+                  </td>
+                  <td className="px-3 py-3 text-left align-top">
+                    {place.categoryName.concat(' - ', place.subcategoryName)}
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 text-left align-top">
                     {place.id}
@@ -106,28 +125,22 @@ export default async function PlacesTable({
                     {place.instagram}
                   </td>
                   <td className="px-3 py-3 text-left align-top">
-                    {place.official_url}
+                    {place.officialUrl}
                   </td>
                   <td className="px-3 py-3 text-left align-top">
-                    {truncateText(place.description_es, 40)}
+                    {truncateText(place.descriptionEs, 40)}
                   </td>
                   <td className="px-3 py-3 text-left align-top">
-                    {truncateText(place.description_en, 40)}
+                    {truncateText(place.descriptionEn, 40)}
                   </td>
                   <td className="px-3 py-3 text-left align-top">
-                    {place.trick_es}
+                    {place.trickEs}
                   </td>
                   <td className="px-3 py-3 text-left align-top">
-                    {place.trick_en}
+                    {place.trickEn}
                   </td>
                   <td className="px-3 py-3 text-left align-top">
-                    {place.booking_es}
-                  </td>
-                  <td className="px-3 py-3 text-left align-top">
-                    {place.booking_en}
-                  </td>
-                  <td className="px-3 py-3 text-left align-top">
-                    {place.active}
+                    {formatDateToLocal(place.lastUpdate?.toString() || '')}
                   </td>
                 </tr>
               ))}

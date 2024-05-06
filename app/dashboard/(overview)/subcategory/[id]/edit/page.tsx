@@ -19,7 +19,6 @@ export default async function Page({ params }: { params: { id: string } }) {
   const id = params.id;
   const subcategory = await fetchSubcategoryById(parseInt(id));
   const categories = await fetchCategoriesData();
-  console.log('category', categories);
 
   if (!subcategory) {
     notFound();

@@ -25,7 +25,7 @@ export type FormattedCategoriesTable = {
   icon: string;
 };
 
-export type FormattedSucategoriesTable = {
+export type FormattedSubcategoriesTable = {
   id: number;
   category_id: number;
   name: string;
@@ -35,32 +35,43 @@ export type FormattedSucategoriesTable = {
 
 export type PlacesTable = {
   id: number;
-  categories: number[];
-  subcategories: number[];
+  categoryId: number;
+  subcategoryId: number;
   name: string;
   photos: string[];
   lat: number;
   lng: number;
-  description_es: string;
-  description_en: string;
+  descriptionEs: string;
+  descriptionEn: string;
   categoryIcon: string;
   subcategoryIcon: string;
   categoryName: string;
   subcategoryName: string;
   address?: string;
-  phones?: string[];
-  booking_es?: string[];
-  booking_en?: string[];
-  trick_es?: string[];
-  trick_en?: string[];
+  phones?: string;
+  bookingEs?: string;
+  bookingEn?: string;
+  trickEs?: string;
+  trickEn?: string;
+  schedulesEs?: string;
+  schedulesEn?: string;
   city?: string;
   instagram?: string;
   avgPrice?: string;
   googleMapLink?: string;
-  official_url?: string;
+  officialUrl?: string;
   active?: boolean;
   lastUpdate?: string; // Puede que necesites ajustar el tipo de este campo dependiendo del formato de fecha que uses en tu base de datos
   date?: string; // Puede que necesites ajustar el tipo de este campo dependiendo del formato de fecha que uses en tu base de datos
+};
+
+export type UserTable = {
+  id: string;
+  name: string;
+  email: string;
+  image: string;
+  date: string;
+  role: string;
 };
 
 export type User = {
