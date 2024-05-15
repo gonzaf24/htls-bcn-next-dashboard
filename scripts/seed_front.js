@@ -181,9 +181,14 @@ async function seedUsers(client) {
     const createTable = await client.sql`
       CREATE TABLE IF NOT EXISTS users (
         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+        alias TEXT NOT NULL UNIQUE,
         name VARCHAR(255) NOT NULL,
         email TEXT NOT NULL UNIQUE,
         image TEXT,
+        birth_year INTEGER CHECK (birth_year >= 1000 AND birth_year <= 9999),
+        active BOOLEAN DEFAULT TRUE,
+        sex CHAR(1) CHECK (sex IN ('F', 'M', 'O')),
+        registered BOOLEAN DEFAULT FALSE,
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `;
@@ -225,6 +230,34 @@ async function seedBooksmarks(client) {
   }
 }
 
+async function seedReviews(client) {
+  try {
+    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+    // Create the "users" table if it doesn't exist
+    const createTable = await client.sql`
+      CREATE TABLE IF NOT EXISTS reviews (
+        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+        id_place INTEGER NOT NULL REFERENCES places(id),
+        id_user UUID NOT NULL REFERENCES users(id),
+        rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+        review TEXT,
+        active BOOLEAN DEFAULT TRUE,
+        modaltity TEXT,
+        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    console.log(`Created "reviews" table`);
+
+    return {
+      createTable,
+    };
+  } catch (error) {
+    console.error('Error seeding reviews:', error);
+    throw error;
+  }
+}
+
 async function main() {
   const client = await db.connect();
 
@@ -233,7 +266,7 @@ async function main() {
   await seedPlaces(client);
   await seedUsers(client);
   await seedBooksmarks(client);
-
+  await seedReviews(client);
   await client.end();
 }
 
