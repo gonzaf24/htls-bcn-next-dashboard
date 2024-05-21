@@ -237,12 +237,12 @@ async function seedReviews(client) {
     const createTable = await client.sql`
       CREATE TABLE IF NOT EXISTS reviews (
         id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
-        id_place INTEGER NOT NULL REFERENCES places(id),
-        id_user UUID NOT NULL REFERENCES users(id),
+        place_id INTEGER NOT NULL REFERENCES places(id),
+        user_id UUID NOT NULL REFERENCES users(id),
         rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
-        review TEXT,
+        text TEXT,
         active BOOLEAN DEFAULT TRUE,
-        modaltity TEXT,
+        reason TEXT,
         date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `;
@@ -261,11 +261,11 @@ async function seedReviews(client) {
 async function main() {
   const client = await db.connect();
 
-  await seedCategories(client);
+/*   await seedCategories(client);
   await seedSubcategories(client);
   await seedPlaces(client);
   await seedUsers(client);
-  await seedBooksmarks(client);
+  await seedBooksmarks(client); */
   await seedReviews(client);
   await client.end();
 }

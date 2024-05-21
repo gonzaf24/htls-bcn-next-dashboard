@@ -20,6 +20,8 @@ export default async function PlacesTable({
     query,
     currentPage,
   )) as PlacesTableDef[];
+
+  
   return (
     <div className="mt-6 flow-root overflow-x-scroll">
       <div className="inline-block min-w-full align-middle">
