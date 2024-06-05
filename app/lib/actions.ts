@@ -188,7 +188,6 @@ export type EventState = {
   message?: string | null;
 };
 
-
 const ITEMS_PER_PAGE = 6;
 
 export async function fetchFilteredPlaces(query: string, currentPage: number) {
@@ -557,7 +556,6 @@ export async function createPlace(prevState: State, formData: FormData) {
       ARRAY[${photos.map((url) => `${url}`).join(',')}]::text[]
     )
     `;
-      
   } catch (error) {
     console.error('Database Error:', error);
     // If a database error occurs, return a more specific error.
@@ -568,11 +566,9 @@ export async function createPlace(prevState: State, formData: FormData) {
   // Revalidate the cache for the places page and redirect the user.
   revalidatePath('/dashboard/places');
   redirect('/dashboard/places');
-
 }
 
 export async function createEvent(prevState: EventState, formData: FormData) {
-
   const validatedFields = CreateEvent.safeParse({
     title: formData.get('title'),
     description_en: formData.get('description_en'),
@@ -594,7 +590,7 @@ export async function createEvent(prevState: EventState, formData: FormData) {
     official_link: formData.get('official_link' || null)?.toString(),
   };
 
-  const user_id= "6a3970f1-1ec6-4d53-a137-40e005fc52a2";
+  const user_id = '6a3970f1-1ec6-4d53-a137-40e005fc52a2';
 
   if (!validatedFields.success) {
     return {
@@ -613,8 +609,15 @@ export async function createEvent(prevState: EventState, formData: FormData) {
     contact_phone,
   } = validatedFields.data;
 
-  const { tickets_link, instagram_link, official_link, photos, tags, free, price  } =
-    eventData;
+  const {
+    tickets_link,
+    instagram_link,
+    official_link,
+    photos,
+    tags,
+    free,
+    price,
+  } = eventData;
 
   try {
     await sql`
@@ -654,7 +657,6 @@ export async function createEvent(prevState: EventState, formData: FormData) {
         ${user_id}
       )
     `;
-
   } catch (error) {
     console.error('Database Error:', error);
     return { message: 'Database Error: Failed to Create Event.' };
@@ -790,6 +792,7 @@ export async function updateEvent(prevState: EventState, formData: FormData) {
   };
 
   if (!validatedFields.success) {
+    console.log('validatedFields', validatedFields);
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Missing Fields. Failed to Update Event.',
@@ -806,8 +809,16 @@ export async function updateEvent(prevState: EventState, formData: FormData) {
     contact_phone,
   } = validatedFields.data;
 
-  const { id, tickets_link, instagram_link, official_link, photos, tags, free, price  } =
-    eventData;
+  const {
+    id,
+    tickets_link,
+    instagram_link,
+    official_link,
+    photos,
+    tags,
+    free,
+    price,
+  } = eventData;
 
   try {
     await sql`
@@ -839,7 +850,6 @@ export async function updateEvent(prevState: EventState, formData: FormData) {
   redirect('/dashboard/events');
 }
 
-
 export async function deletePlace(id: string) {
   // throw new Error('Failed to Delete category');
 
@@ -861,7 +871,6 @@ export async function deleteEvent(id: string) {
     return { message: 'Database Error: Failed to Delete Event.' };
   }
 }
-
 
 export async function authenticate(
   prevState: string | undefined,

@@ -1,6 +1,6 @@
-import '@/app/ui/global.css';
-import { inter } from '@/app/ui/fonts';
+import './global.css';
 import { Metadata } from 'next';
+import { NextUIProvider } from '@nextui-org/react';
 
 export const metadata: Metadata = {
   title: {
@@ -16,7 +16,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <NextUIProvider>{children}</NextUIProvider>
+      </body>
     </html>
   );
 }

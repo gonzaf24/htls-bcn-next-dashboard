@@ -6,12 +6,14 @@ import { Button } from '@/app/ui/button';
 import { useState } from 'react';
 import { createEvent } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
+import TagsForm from '@/app/ui/events/tagsForm';
 
 export default function Form({}: {}) {
   const initialState = { message: null, errors: {} };
-  const [state, dispatch] = useFormState( createEvent, initialState );
+  const [state, dispatch] = useFormState(createEvent, initialState);
   const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([]);
   const [photosError, setPhotosError] = useState<string>();
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -21,6 +23,7 @@ export default function Form({}: {}) {
       for (const photo of uploadedPhotos) {
         formData.append('photos', photo);
       }
+      formData.append('tags', selectedTags.join(','));
       dispatch(formData);
     } catch (error) {
       console.log('Create dispatch error: ', error);
@@ -92,31 +95,31 @@ export default function Form({}: {}) {
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Start date */}
         <div className="mb-4">
-  <label
-    htmlFor="date_start"
-    className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
-  >
-    Start date
-  </label>
-  <div className="relative mt-2 rounded-md">
-    <input
-      id="date_start"
-      name="date_start"
-      type="datetime-local"
-      className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
-      aria-describedby="date_start-error"
-    />
-  </div>
+          <label
+            htmlFor="date_start"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Start date
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="date_start"
+              name="date_start"
+              type="datetime-local"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="date_start-error"
+            />
+          </div>
 
-  <div id="date_start-error" aria-live="polite" aria-atomic="true">
-    {state.errors?.date_start &&
-      state.errors.date_start.map((error: string) => (
-        <p className="mt-2 text-sm text-red-500" key={error}>
-          {error}
-        </p>
-      ))}
-  </div>
-</div>
+          <div id="date_start-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.date_start &&
+              state.errors.date_start.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
 
         {/* End date */}
         <div className="mb-4">
@@ -272,33 +275,6 @@ export default function Form({}: {}) {
           <div id="price-error" aria-live="polite" aria-atomic="true">
             {state.errors?.price &&
               state.errors.price.map((error: string) => (
-                <p className="mt-2 text-sm text-red-500" key={error}>
-                  {error}
-                </p>
-              ))}
-          </div>
-        </div>
-        {/* Tags hastags */}
-        <div className="mb-4">
-          <label
-            htmlFor="tags"
-            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
-          >
-            Tags
-          </label>
-          <div className="relative mt-2 rounded-md">
-            <input
-              id="tags"
-              name="tags"
-              type="text"
-              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
-              aria-describedby="tags-error"
-            />
-          </div>
-
-          <div id="tags-error" aria-live="polite" aria-atomic="true">
-            {state.errors?.tags &&
-              state.errors.tags.map((error: string) => (
                 <p className="mt-2 text-sm text-red-500" key={error}>
                   {error}
                 </p>
@@ -526,6 +502,7 @@ export default function Form({}: {}) {
               ))}
           </div>
         </div>
+        <TagsForm setSelectedTags={setSelectedTags} />
         <div aria-live="polite" aria-atomic="true">
           {state.message ? (
             <p className="mt-2 text-sm text-red-500">{state.message}</p>

@@ -43,9 +43,9 @@ export const mapEventsDataToEvents = (eventsData: any): EventsTable => ({
   dateStart: eventsData.date_start,
   dateEnd: eventsData.date_end,
   photos: eventsData.photos
-  .toString()
-  .split(',')
-  .map((url: string) => url.trim()),
+    .toString()
+    .split(',')
+    .map((url: string) => url.trim()),
   tags: eventsData.tags
     .toString()
     .split(',')

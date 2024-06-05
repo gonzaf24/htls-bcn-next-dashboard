@@ -2,7 +2,10 @@ import { fetchFilteredEvents } from '@/app/lib/data';
 import Link from 'next/link';
 import CarouselFullsize from '../carousel-fullsize';
 import { DeleteEvent } from './delete-form';
-import { formatDateHourseMinutesToLocal, formatDateToLocal } from '@/app/lib/utils';
+import {
+  formatDateHourseMinutesToLocal,
+  formatDateToLocal,
+} from '@/app/lib/utils';
 import { EventsTable as EventsTableDef } from '@/app/lib/definitions';
 
 export default async function EventsTable({
@@ -20,6 +23,8 @@ export default async function EventsTable({
     query,
     currentPage,
   )) as EventsTableDef[];
+
+  console.log('events', events);
 
   return (
     <div className="mt-6 flow-root overflow-x-scroll">
@@ -79,8 +84,11 @@ export default async function EventsTable({
                     {event.approved ? 'Yes' : 'No'}
                   </td>
                   <td className="px-4 py-3 text-left align-top text-sm">
-                    { event.tags.map((tag, index) => (
-                      <span key={index} className="inline-block px-2 py-1 text-xs font-semibold bg-gray-200 text-gray-800 rounded-full mr-1">
+                    {event?.tags?.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="mr-1 inline-block rounded-full bg-gray-200 px-2 py-1 text-xs font-semibold text-gray-800"
+                      >
                         {tag}
                       </span>
                     ))}
@@ -95,10 +103,12 @@ export default async function EventsTable({
                     {truncateText(event.descriptionEn, 100)}
                   </td>
                   <td className="px-4 py-3 text-left align-top text-sm">
-                    {formatDateToLocal(event.dateStart)} - {formatDateHourseMinutesToLocal(event.dateStart)}
+                    {formatDateToLocal(event.dateStart)} -{' '}
+                    {formatDateHourseMinutesToLocal(event.dateStart)}
                   </td>
                   <td className="px-4 py-3 text-left align-top text-sm">
-                    {formatDateToLocal(event.dateEnd)} - {formatDateHourseMinutesToLocal(event.dateEnd)}
+                    {formatDateToLocal(event.dateEnd)} -{' '}
+                    {formatDateHourseMinutesToLocal(event.dateEnd)}
                   </td>
                 </tr>
               ))}

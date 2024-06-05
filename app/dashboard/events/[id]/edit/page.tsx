@@ -1,6 +1,4 @@
-import {
-  fetchEvent
-} from '@/app/lib/data';
+import { fetchEvent } from '@/app/lib/data';
 import Breadcrumbs from '@/app/ui/invoices/breadcrumbs';
 import Form from '@/app/ui/events/edit-form';
 import { Metadata } from 'next';
@@ -12,8 +10,8 @@ export const metadata: Metadata = {
 
 export default async function Page({ params }: { params: { id: string } }) {
   const id = params.id;
-  const event = await fetchEvent(id) as EventsTable
-  
+  const event = (await fetchEvent(id)) as EventsTable;
+
   return (
     <main>
       <Breadcrumbs
@@ -26,7 +24,7 @@ export default async function Page({ params }: { params: { id: string } }) {
           },
         ]}
       />
-      <Form event={event}/>
+      <Form event={event} />
     </main>
   );
 }

@@ -344,7 +344,6 @@ export async function fetchEvent(id: string) {
   }
 }
 
-
 export async function fetchUsersPages(query: string) {
   noStore();
   try {

@@ -5,18 +5,22 @@ import Link from 'next/link';
 import { Button } from '@/app/ui/button';
 import { updateEvent } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { EventsTable } from '@/app/lib/definitions';
+import TagsForm from './tagsForm';
 
-export default function Form({
-  event,
-}: {
-  event: EventsTable;
-}) {
+export default function Form({ event }: { event: EventsTable }) {
   const initialState = { message: null, errors: {} };
-  const [state, dispatch] = useFormState( updateEvent, initialState );
-  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>(event.photos);
+  const [state, dispatch] = useFormState(updateEvent, initialState);
+  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>(
+    event?.photos || [],
+  );
   const [photosError, setPhotosError] = useState<string>();
+  const [selectedTags, setSelectedTags] = useState<string[]>(event?.tags || []);
+
+  useEffect(() => {
+    setSelectedTags(event.tags);
+  }, [event.tags]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,6 +30,9 @@ export default function Form({
       for (const photo of uploadedPhotos) {
         formData.append('photos', photo);
       }
+      const filteredTags = selectedTags.filter((tag) => tag.trim() !== '');
+      console.log('selectedTags: ', filteredTags);
+      formData.append('tags', filteredTags.join(','));
       dispatch(formData);
     } catch (error) {
       console.log('Create dispatch error: ', error);
@@ -92,6 +99,20 @@ export default function Form({
     }
   }
 
+  const formatDateTime = (dateString = '') => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
+  console.log('event sss , ', event.dateStart);
+  const dateStart = event.dateStart ? formatDateTime(event.dateStart) : '';
+  const dateEnd = event.dateEnd ? formatDateTime(event.dateEnd) : '';
+
   return (
     <form onSubmit={handleSubmit} id="update-event-form">
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
@@ -107,7 +128,7 @@ export default function Form({
             <input
               id="id"
               name="id"
-              type='text'
+              type="text"
               step="0.01"
               className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
               aria-describedby="id-error"
@@ -119,6 +140,61 @@ export default function Form({
           <div id="id-error" aria-live="polite" aria-atomic="true">
             {state.errors?.id &&
               state.errors.id.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* Date start */}
+        <div className="mb-4">
+          <label
+            htmlFor="date_start"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Date Start
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="date_start"
+              name="date_start"
+              type="datetime-local"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="date_start-error"
+              defaultValue={dateStart}
+            />
+          </div>
+          <div id="date_start-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.date_start &&
+              state.errors.date_start.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* Date end */}
+        <div className="mb-4">
+          <label
+            htmlFor="date_end"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Date End
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="date_end"
+              name="date_end"
+              type="datetime-local"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="date_end-error"
+              defaultValue={dateEnd}
+            />
+          </div>
+
+          <div id="date_end-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.date_end &&
+              state.errors.date_end.map((error: string) => (
                 <p className="mt-2 text-sm text-red-500" key={error}>
                   {error}
                 </p>
@@ -260,7 +336,7 @@ export default function Form({
                 </p>
               ))}
           </div>
-        </div>  
+        </div>
         {/* Photos */}
         <div className="mb-4">
           <label
@@ -325,6 +401,94 @@ export default function Form({
           {photosError && (
             <p className="mt-2 text-sm text-red-500">{photosError}</p>
           )}
+        </div>
+        {/* contact name */}
+        <div className="mb-4">
+          <label
+            htmlFor="contact_name"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Contact Name
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="contact_name"
+              name="contact_name"
+              type="text"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="contact_name-error"
+              defaultValue={event.contactName}
+            />
+          </div>
+
+          <div id="contact_name-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.contact_name &&
+              state.errors.contact_name.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* contact email */}
+        <div className="mb-4">
+          <label
+            htmlFor="contact_email"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Contact Email
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="contact_email"
+              name="contact_email"
+              type="email"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="contact_email-error"
+              defaultValue={event.contactEmail}
+            />
+          </div>
+
+          <div id="contact_email-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.contact_email &&
+              state.errors.contact_email.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* contact phone */}
+        <div className="mb-4">
+          <label
+            htmlFor="contact_phone"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Contact Phone
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="contact_phone"
+              name="contact_phone"
+              type="text"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="contact_phone-error"
+              defaultValue={event.contactPhone}
+            />
+          </div>
+
+          <div id="contact_phone-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.contact_phone &&
+              state.errors.contact_phone.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* tags */}
+        <div className="mb-4">
+          <TagsForm setSelectedTags={setSelectedTags} tags={event.tags} />
         </div>
         <div aria-live="polite" aria-atomic="true">
           {state.message ? (
