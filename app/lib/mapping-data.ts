@@ -1,4 +1,4 @@
-import { PlacesTable } from './definitions';
+import { EventsTable, PlacesTable } from './definitions';
 
 // Función para mapear los datos de un lugar a un objeto Place
 export const mapPlaceDataToPlace = (placeData: any): PlacesTable => ({
@@ -33,4 +33,32 @@ export const mapPlaceDataToPlace = (placeData: any): PlacesTable => ({
   officialUrl: placeData.official_url,
   active: placeData.active,
   lastUpdate: placeData.last_update,
+});
+
+export const mapEventsDataToEvents = (eventsData: any): EventsTable => ({
+  id: eventsData.id,
+  title: eventsData.title,
+  descriptionEn: eventsData.description_en,
+  descriptionEs: eventsData.description_es,
+  dateStart: eventsData.date_start,
+  dateEnd: eventsData.date_end,
+  photos: eventsData.photos
+  .toString()
+  .split(',')
+  .map((url: string) => url.trim()),
+  tags: eventsData.tags
+    .toString()
+    .split(',')
+    .map((tag: string) => tag.trim()),
+  free: eventsData.free,
+  price: eventsData.price,
+  ticketsLink: eventsData.tickets_link,
+  instagramLink: eventsData.instagram_link,
+  officialLink: eventsData.official_link,
+  active: eventsData.active,
+  approved: eventsData.approved,
+  contactName: eventsData.contact_name,
+  contactEmail: eventsData.contact_email,
+  contactPhone: eventsData.contact_phone,
+  date: eventsData.date,
 });

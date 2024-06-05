@@ -5,9 +5,10 @@ import {
   Subcategory,
   PlacesTable,
   UserTable,
+  EventsTable,
 } from './definitions';
 import { unstable_noStore as noStore } from 'next/cache';
-import { mapPlaceDataToPlace } from './mapping-data';
+import { mapEventsDataToEvents, mapPlaceDataToPlace } from './mapping-data';
 
 export const fetchCategoriesData = async () => {
   noStore();
@@ -42,6 +43,8 @@ export async function fetchCategoryById(id: number) {
   }
 }
 
+const ITEMS_PER_PAGE = 6;
+
 export async function fetchPlacesPages(query: string) {
   noStore();
   try {
@@ -70,7 +73,32 @@ export async function fetchPlacesPages(query: string) {
   }
 }
 
-const ITEMS_PER_PAGE = 6;
+export async function fetchEventsPages(query: string) {
+  noStore();
+  try {
+    const count = await sql`
+  SELECT COUNT(*)
+  FROM events
+  WHERE
+    CAST(events.id AS TEXT) ILIKE ${`%${query}%`} OR
+    events.title ILIKE ${`%${query}%`} OR
+    events.description_en ILIKE ${`%${query}%`} OR
+    events.description_es ILIKE ${`%${query}%`} OR
+    ${`%${query}%`} = ANY(events.tags) OR
+    events.contact_name ILIKE ${`%${query}%`} OR
+    events.contact_email ILIKE ${`%${query}%`} OR
+    events.contact_phone ILIKE ${`%${query}%`}
+  `;
+
+    const totalPages = Math.ceil(Number(count.rows[0].count) / ITEMS_PER_PAGE);
+
+    return totalPages;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return 0;
+    //throw new Error('Failed to fetch total number of invoices.');
+  }
+}
 
 export async function fetchFilteredPlaces(query: string, currentPage: number) {
   noStore();
@@ -124,6 +152,57 @@ export async function fetchFilteredPlaces(query: string, currentPage: number) {
       mapPlaceDataToPlace(row),
     );
     return places;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+    //throw new Error('Failed to fetch places.');
+  }
+}
+
+export async function fetchFilteredEvents(query: string, currentPage: number) {
+  noStore();
+  const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+  try {
+    const data = await sql<EventsTable>`
+        SELECT
+          e.id,
+          e.title,
+          e.description_en,
+          e.description_es,
+          e.date_start,
+          e.date_end,
+          e.photos,
+          e.tags,
+          e.free,
+          e.price,
+          e.approved,
+          e.tickets_link,
+          e.instagram_link,
+          e.official_link,
+          e.active,
+          e.contact_name,
+          e.contact_email,
+          e.contact_phone,
+          e.date
+        FROM events e
+        WHERE
+          CAST(e.id AS TEXT) ILIKE ${`%${query}%`} OR
+          e.title ILIKE ${`%${query}%`} OR
+          e.description_en ILIKE ${`%${query}%`} OR
+          e.description_es ILIKE ${`%${query}%`} OR
+          ${`%${query}%`} = ANY(e.tags) OR
+          e.contact_name ILIKE ${`%${query}%`} OR
+          e.contact_email ILIKE ${`%${query}%`} OR
+          e.contact_phone ILIKE ${`%${query}%`}
+        ORDER BY e.date ASC
+        LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
+      `;
+
+    const events: EventsTable[] = data.rows.map((row: EventsTable) =>
+      mapEventsDataToEvents(row),
+    );
+
+    return events;
   } catch (error) {
     console.error('Database Error:', error);
     return [];
@@ -229,6 +308,42 @@ export async function fetchPlace(id: number) {
     return [];
   }
 }
+
+export async function fetchEvent(id: string) {
+  noStore();
+  try {
+    const data = await sql<EventsTable>`
+      SELECT
+        e.id,
+        e.title,
+        e.description_en,
+        e.description_es,
+        e.date_start,
+        e.date_end,
+        e.photos,
+        e.tags,
+        e.free,
+        e.price,
+        e.approved,
+        e.tickets_link,
+        e.instagram_link,
+        e.official_link,
+        e.active,
+        e.contact_name,
+        e.contact_email,
+        e.contact_phone,
+        e.date
+      FROM events e
+      WHERE e.id=${id}
+    `;
+    const event = data.rows[0] ? mapEventsDataToEvents(data.rows[0]) : null;
+    return event;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return [];
+  }
+}
+
 
 export async function fetchUsersPages(query: string) {
   noStore();

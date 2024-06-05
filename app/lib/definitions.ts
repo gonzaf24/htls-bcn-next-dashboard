@@ -65,6 +65,28 @@ export type PlacesTable = {
   date?: string; // Puede que necesites ajustar el tipo de este campo dependiendo del formato de fecha que uses en tu base de datos
 };
 
+export type EventsTable = {
+  id: string;
+  title: string;
+  descriptionEn: string;
+  descriptionEs: string;
+  dateStart: string;
+  dateEnd: string;
+  photos: string[];
+  tags: string[];
+  free: boolean;
+  price: number;
+  ticketsLink: string;
+  instagramLink: string;
+  officialLink: string;
+  contactName: string;
+  contactEmail: string;
+  contactPhone: string;
+  active: boolean;
+  approved: boolean;
+  date: string;
+};
+
 export type UserTable = {
   id: string;
   name: string;

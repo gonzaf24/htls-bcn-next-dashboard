@@ -258,15 +258,80 @@ async function seedReviews(client) {
   }
 }
 
+async function seedEvents(client) {
+  try {
+    await client.sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`;
+    // Create the "events" table if it doesn't exist
+    const createTable = await client.sql`
+      CREATE TABLE IF NOT EXISTS events (
+        id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+        user_id UUID NOT NULL,
+        title TEXT NOT NULL,
+        description_en TEXT  NOT NULL,
+        description_es TEXT NOT NULL,
+        date_start TIMESTAMP NOT NULL,
+        date_end TIMESTAMP NOT NULL,
+        photos TEXT[],
+        tags TEXT[],
+        free BOOLEAN DEFAULT FALSE,
+        price FLOAT,
+        tickets_link TEXT,
+        instagram_link TEXT,
+        official_link TEXT,
+        contact_name TEXT,
+        contact_email TEXT,
+        contact_phone TEXT,
+        approved BOOLEAN DEFAULT false,
+        active BOOLEAN DEFAULT false,
+        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    console.log(`Created "events" table`);
+
+    return {
+      createTable,
+    };
+  } catch (error) {
+    console.error('Error seeding events:', error);
+    throw error;
+  }
+}
+
+async function seedSuggestedTags(client) {
+  try {
+    // Crear la tabla "suggested_tags" si no existe
+    const createTable = await client.sql`
+      CREATE TABLE IF NOT EXISTS suggested_tags (
+        id SERIAL PRIMARY KEY,
+        user_id UUID NOT NULL REFERENCES users(id),
+        date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        tag VARCHAR(255) NOT NULL
+      );
+    `;
+
+    console.log(`Created "suggested_tags" table`);
+
+    return {
+      createTable,
+    };
+  } catch (error) {
+    console.error('Error creating suggested_tags table:', error);
+    throw error;
+  }
+}
+
 async function main() {
   const client = await db.connect();
 
-/*   await seedCategories(client);
+  await seedCategories(client);
   await seedSubcategories(client);
   await seedPlaces(client);
   await seedUsers(client);
-  await seedBooksmarks(client); */
+  await seedBooksmarks(client);
   await seedReviews(client);
+  await seedEvents(client);
+  await seedSuggestedTags(client);
   await client.end();
 }
 

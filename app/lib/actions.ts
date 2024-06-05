@@ -72,6 +72,47 @@ const FormPlaceSchema = z.object({
   }),
 });
 
+const FormEventSchema = z
+  .object({
+    title: z.string().nonempty({
+      message: 'Please enter a title.',
+    }),
+    description_en: z.string().nonempty({
+      message: 'Please enter a description in English.',
+    }),
+    description_es: z.string().nonempty({
+      message: 'Please enter a description in Spanish.',
+    }),
+    date_start: z.string().nonempty({
+      message: 'Please enter a start date.',
+    }),
+    date_end: z.string().nonempty({
+      message: 'Please enter an end date.',
+    }),
+    contact_name: z.string().nonempty({
+      message: 'Please enter a contact name.',
+    }),
+    contact_email: z.string().nonempty({
+      message: 'Please enter a contact email.',
+    }),
+    contact_phone: z.string().nonempty({
+      message: 'Please enter a contact phone.',
+    }),
+  })
+  .superRefine((data, ctx) => {
+    const dateStart = new Date(data.date_start);
+    const dateEnd = new Date(data.date_end);
+
+    if (dateEnd <= dateStart) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'The end date must be after the start date.',
+        path: ['date_end'], // This points to the specific field causing the issue
+      });
+    }
+  });
+
+const CreateEvent = FormEventSchema;
 const CreatePlace = FormPlaceSchema;
 const CreateSubcategory = FormSubcategorySchema;
 const UpdateSubcategory = FormSubcategorySchema.omit({
@@ -109,9 +150,44 @@ export type State = {
     phones?: string[];
     active?: string[];
     photos?: string[];
+    price?: string[];
+    official_link?: string[];
+    instagram_link?: string[];
+    tickets_link?: string[];
+    free?: string[];
+    title?: string[];
+    date_start?: string[];
+    date_end?: string[];
+    contact_name?: string[];
+    contact_email?: string[];
+    contact_phone?: string[];
   };
   message?: string | null;
 };
+
+export type EventState = {
+  errors?: {
+    id?: string[];
+    title?: string[];
+    description_en?: string[];
+    description_es?: string[];
+    date_start?: string[];
+    date_end?: string[];
+    free?: string[];
+    price?: string[];
+    contact_name?: string[];
+    contact_email?: string[];
+    contact_phone?: string[];
+    official_link?: string[];
+    instagram_link?: string[];
+    tickets_link?: string[];
+    tags?: string[];
+    active?: string[];
+    approved?: string[];
+  };
+  message?: string | null;
+};
+
 
 const ITEMS_PER_PAGE = 6;
 
@@ -479,8 +555,9 @@ export async function createPlace(prevState: State, formData: FormData) {
       ${String(official_url)},
       ${false},
       ARRAY[${photos.map((url) => `${url}`).join(',')}]::text[]
-    );
+    )
     `;
+      
   } catch (error) {
     console.error('Database Error:', error);
     // If a database error occurs, return a more specific error.
@@ -488,10 +565,102 @@ export async function createPlace(prevState: State, formData: FormData) {
       message: 'Database Error: Failed to Create Place.',
     };
   }
-
   // Revalidate the cache for the places page and redirect the user.
   revalidatePath('/dashboard/places');
   redirect('/dashboard/places');
+
+}
+
+export async function createEvent(prevState: EventState, formData: FormData) {
+
+  const validatedFields = CreateEvent.safeParse({
+    title: formData.get('title'),
+    description_en: formData.get('description_en'),
+    description_es: formData.get('description_es'),
+    date_start: formData.get('date_start'),
+    date_end: formData.get('date_end'),
+    contact_name: formData.get('contact_name'),
+    contact_email: formData.get('contact_email'),
+    contact_phone: formData.get('contact_phone'),
+  });
+
+  const eventData = {
+    tags: formData.getAll('tags') || '',
+    free: formData.get('free') || (false as boolean),
+    price: formData.get('price') || '' || 0,
+    photos: formData.getAll('photos') || '',
+    tickets_link: formData.get('tickets_link' || '')?.toString(),
+    instagram_link: formData.get('instagram_link' || null)?.toString(),
+    official_link: formData.get('official_link' || null)?.toString(),
+  };
+
+  const user_id= "6a3970f1-1ec6-4d53-a137-40e005fc52a2";
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Create Event.',
+    };
+  }
+  const {
+    title,
+    description_en,
+    description_es,
+    date_start,
+    date_end,
+    contact_name,
+    contact_email,
+    contact_phone,
+  } = validatedFields.data;
+
+  const { tickets_link, instagram_link, official_link, photos, tags, free, price  } =
+    eventData;
+
+  try {
+    await sql`
+      INSERT INTO events (
+        title,
+        description_en,
+        description_es,
+        date_start,
+        date_end,
+        photos,
+        tags,
+        free,
+        price,
+        tickets_link,
+        instagram_link,
+        official_link,
+        contact_name,
+        contact_email,
+        contact_phone,
+        user_id
+      ) VALUES (
+        ${title},
+        ${description_en},
+        ${description_es},
+        ${date_start},
+        ${date_end},
+        ARRAY[${photos.map((url) => `${url}`).join(',')}]::text[],
+        ARRAY[${tags.map((tag) => `${tag}`).join(',')}]::text[],
+        ${Boolean(free)},
+        ${Number(price)},
+        ${tickets_link},
+        ${instagram_link},
+        ${official_link},
+        ${contact_name},
+        ${contact_email},
+        ${contact_phone},
+        ${user_id}
+      )
+    `;
+
+  } catch (error) {
+    console.error('Database Error:', error);
+    return { message: 'Database Error: Failed to Create Event.' };
+  }
+  revalidatePath('/dashboard/events');
+  redirect('/dashboard/events');
 }
 
 export async function updatePlace(prevState: State, formData: FormData) {
@@ -597,7 +766,81 @@ export async function updatePlace(prevState: State, formData: FormData) {
   redirect('/dashboard/places');
 }
 
-export async function deletePlace(id: number) {
+export async function updateEvent(prevState: EventState, formData: FormData) {
+  const validatedFields = CreateEvent.safeParse({
+    title: formData.get('title'),
+    description_en: formData.get('description_en'),
+    description_es: formData.get('description_es'),
+    date_start: formData.get('date_start'),
+    date_end: formData.get('date_end'),
+    contact_name: formData.get('contact_name'),
+    contact_email: formData.get('contact_email'),
+    contact_phone: formData.get('contact_phone'),
+  });
+
+  const eventData = {
+    id: formData.get('id' || '')?.toString(),
+    tags: formData.getAll('tags') || '',
+    free: formData.get('free') || (false as boolean),
+    price: formData.get('price') || '' || 0,
+    photos: formData.getAll('photos') || '',
+    tickets_link: formData.get('tickets_link' || '')?.toString(),
+    instagram_link: formData.get('instagram_link' || null)?.toString(),
+    official_link: formData.get('official_link' || null)?.toString(),
+  };
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: 'Missing Fields. Failed to Update Event.',
+    };
+  }
+  const {
+    title,
+    description_en,
+    description_es,
+    date_start,
+    date_end,
+    contact_name,
+    contact_email,
+    contact_phone,
+  } = validatedFields.data;
+
+  const { id, tickets_link, instagram_link, official_link, photos, tags, free, price  } =
+    eventData;
+
+  try {
+    await sql`
+      UPDATE events
+      SET
+        title = ${title},
+        description_en = ${description_en},
+        description_es = ${description_es},
+        date_start = ${date_start},
+        date_end = ${date_end},
+        photos = ARRAY[${photos.map((url) => `${url}`).join(',')}]::text[],
+        tags = ARRAY[${tags.map((tag) => `${tag}`).join(',')}]::text[],
+        free = ${Boolean(free)},
+        price = ${Number(price)},
+        tickets_link = ${tickets_link},
+        instagram_link = ${instagram_link},
+        official_link = ${official_link},
+        contact_name = ${contact_name},
+        contact_email = ${contact_email},
+        contact_phone = ${contact_phone}
+      WHERE id = ${id}
+    `;
+  } catch (error) {
+    console.error('Database Error:', error);
+    return { message: 'Database Error: Failed to Update Event.' };
+  }
+
+  revalidatePath('/dashboard/events');
+  redirect('/dashboard/events');
+}
+
+
+export async function deletePlace(id: string) {
   // throw new Error('Failed to Delete category');
 
   try {
@@ -608,6 +851,17 @@ export async function deletePlace(id: number) {
     return { message: 'Database Error: Failed to Delete Place.' };
   }
 }
+
+export async function deleteEvent(id: string) {
+  try {
+    await sql`DELETE FROM events WHERE id = ${id}`;
+    revalidatePath('/dashboard/events');
+    return { message: 'Event deleted' };
+  } catch (error) {
+    return { message: 'Database Error: Failed to Delete Event.' };
+  }
+}
+
 
 export async function authenticate(
   prevState: string | undefined,

@@ -60,7 +60,11 @@ export default async function HtlsUsersTable({
                         <p>{user.email}</p>
                       </td>
                       <td className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6">
-                        <img src={user.image} alt={user.name} className="w-5 h-5 rounded-full" />
+                        <img
+                          src={user.image}
+                          alt={user.name}
+                          className="h-5 w-5 rounded-full"
+                        />
                       </td>
                       <td className="whitespace-nowrap bg-white py-5 pl-4 pr-3 text-sm text-black group-first-of-type:rounded-md group-last-of-type:rounded-md sm:pl-6">
                         <p>{user.id}</p>

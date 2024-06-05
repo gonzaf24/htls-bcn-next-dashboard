@@ -4,6 +4,7 @@ import {
   UserGroupIcon,
   TagIcon,
   BuildingStorefrontIcon,
+  CalendarIcon,
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -19,6 +20,7 @@ const links = [
     icon: BuildingStorefrontIcon,
   },
   { name: 'Users', href: '/dashboard/users', icon: UserGroupIcon },
+  { name: 'Events', href: '/dashboard/events', icon: CalendarIcon },
 ];
 
 export default function NavLinks() {

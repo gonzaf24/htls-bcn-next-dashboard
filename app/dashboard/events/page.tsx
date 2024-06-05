@@ -1,14 +1,14 @@
-import { fetchUsersPages } from '@/app/lib/data';
 import Pagination from '@/app/ui/invoices/pagination';
 import Search from '@/app/ui/search';
+import Table from '@/app/ui/events/table';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
-import DashboardUsersTable from '@/app/ui/users/dash-users-table';
-import HtlsUsersTable from '@/app/ui/users/htls-users-table';
-import { Metadata } from 'next';
 import { Suspense } from 'react';
+import { fetchEventsPages } from '@/app/lib/data';
+import { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Users',
+  title: 'Events',
 };
 
 export default async function Page({
@@ -21,37 +21,36 @@ export default async function Page({
 }) {
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
+  const totalPages = await fetchEventsPages(query);
 
-  const totalPages = await fetchUsersPages(query);
-
-  /*   const customers = await fetchFilteredCustomers(query);
-   */
   return (
-    <main>
+    <div className="w-full">
       <h1
         className={`mb-4 w-min whitespace-nowrap border-4 p-2 text-xl md:text-2xl`}
       >
-        Users
+        Events
       </h1>
       <div className="flex w-full items-center justify-between">
-        <h1 className={`mb-0 text-xl md:text-2xl`}>Dashboard users</h1>
-      </div>
-      <div className="mt-5 flex w-full justify-center">
-        <DashboardUsersTable />
-      </div>
-
-      <div className="mt-5 flex w-full items-center justify-between">
-        <h1 className={`mb-0 text-xl md:text-2xl`}>Highlights users</h1>
+        <h1 className={`mb-0 mb-0 text-xl md:text-2xl`}>All Events</h1>
+        <Link
+          href="/dashboard/events/create"
+          className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+        >
+          + Add Event
+        </Link>
       </div>
       <div className="mt-4 flex items-center justify-between gap-2 md:mt-8">
-        <Search placeholder="Search htls users..." />
+        <Search placeholder="Search places..." />
+      </div>
+      <div className="mt-5 flex w-full justify-center">
+        <Pagination totalPages={totalPages} />
       </div>
       <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
-        <HtlsUsersTable query={query} currentPage={currentPage} />
+        <Table query={query} currentPage={currentPage} />
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
         <Pagination totalPages={totalPages} />
       </div>
-    </main>
+    </div>
   );
 }
