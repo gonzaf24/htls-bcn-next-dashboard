@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useState } from 'react';
 
-export function DeletePlace({ id }: { id: number }) {
+export function DeletePlace({ id }: { id: string }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const deletePlaceyWithId = deletePlace.bind(null, id);

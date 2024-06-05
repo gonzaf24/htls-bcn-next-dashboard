@@ -34,7 +34,7 @@ export type FormattedSubcategoriesTable = {
 };
 
 export type PlacesTable = {
-  id: number;
+  id: string;
   categoryId: number;
   subcategoryId: number;
   name: string;
