@@ -31,7 +31,6 @@ export default function Form({ event }: { event: EventsTable }) {
         formData.append('photos', photo);
       }
       const filteredTags = selectedTags.filter((tag) => tag.trim() !== '');
-      console.log('selectedTags: ', filteredTags);
       formData.append('tags', filteredTags.join(','));
       dispatch(formData);
     } catch (error) {
@@ -109,7 +108,6 @@ export default function Form({ event }: { event: EventsTable }) {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
-  console.log('event sss , ', event.dateStart);
   const dateStart = event.dateStart ? formatDateTime(event.dateStart) : '';
   const dateEnd = event.dateEnd ? formatDateTime(event.dateEnd) : '';
 
@@ -283,54 +281,140 @@ export default function Form({ event }: { event: EventsTable }) {
               ))}
           </div>
         </div>
-        {/* Active */}
+        {/* Its free */}
         <div className="mb-4">
           <label
-            htmlFor="active"
+            htmlFor="free"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
           >
-            Active
+            Free
           </label>
           <div className="relative mt-2 w-min rounded-md">
             <input
-              id="active"
-              name="active"
+              id="free"
+              name="free"
               type="checkbox"
               className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
-              aria-describedby="active-error"
-              defaultChecked={event.active}
+              aria-describedby="free-error"
+              defaultChecked={event.free}
             />
           </div>
-          <div id="active-error" aria-live="polite" aria-atomic="true">
-            {state.errors?.active &&
-              state.errors.active.map((error: string) => (
+          <div id="free-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.free &&
+              state.errors.free.map((error: string) => (
                 <p className="mt-2 text-sm text-red-500" key={error}>
                   {error}
                 </p>
               ))}
           </div>
         </div>
-        {/* approved */}
+        {/* Price */}
         <div className="mb-4">
           <label
-            htmlFor="approved"
+            htmlFor="price"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
           >
-            Approved
+            Price
           </label>
-          <div className="relative mt-2 w-min rounded-md">
+          <div className="relative mt-2 rounded-md">
             <input
-              id="approved"
-              name="approved"
-              type="checkbox"
+              id="price"
+              name="price"
+              type="number"
+              step="0.01"
               className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
-              aria-describedby="approved-error"
-              defaultChecked={event.approved}
+              aria-describedby="price-error"
+              defaultValue={event.price}
             />
           </div>
-          <div id="approved-error" aria-live="polite" aria-atomic="true">
-            {state.errors?.approved &&
-              state.errors.approved.map((error: string) => (
+
+          <div id="price-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.price &&
+              state.errors.price.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* Tickets Link */}
+        <div className="mb-4">
+          <label
+            htmlFor="tickets_link"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Ticket Link
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="tickets_link"
+              name="tickets_link"
+              type="text"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="tickets_link-error"
+              defaultValue={event.ticketsLink}
+            />
+          </div>
+
+          <div id="tickets_link-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.tickets_link &&
+              state.errors.tickets_link.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* Instagram Link */}
+        <div className="mb-4">
+          <label
+            htmlFor="instagram_link"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Instagram Link
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="instagram_link"
+              name="instagram_link"
+              type="text"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="instagram_link-error"
+              defaultValue={event.instagramLink}
+            />
+          </div>
+
+          <div id="instagram_link-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.instagram_link &&
+              state.errors.instagram_link.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* Official Link */}
+        <div className="mb-4">
+          <label
+            htmlFor="official_link"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Official Link
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="official_link"
+              name="official_link"
+              type="text"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="official_link-error"
+              defaultValue={event.officialLink}
+            />
+          </div>
+
+          <div id="official_link-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.official_link &&
+              state.errors.official_link.map((error: string) => (
                 <p className="mt-2 text-sm text-red-500" key={error}>
                   {error}
                 </p>
@@ -489,6 +573,60 @@ export default function Form({ event }: { event: EventsTable }) {
         {/* tags */}
         <div className="mb-4">
           <TagsForm setSelectedTags={setSelectedTags} tags={event.tags} />
+        </div>
+        {/* Active */}
+        <div className="mb-4">
+          <label
+            htmlFor="active"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Active
+          </label>
+          <div className="relative mt-2 w-min rounded-md">
+            <input
+              id="active"
+              name="active"
+              type="checkbox"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="active-error"
+              defaultChecked={event.active}
+            />
+          </div>
+          <div id="active-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.active &&
+              state.errors.active.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* approved */}
+        <div className="mb-4">
+          <label
+            htmlFor="approved"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Approved
+          </label>
+          <div className="relative mt-2 w-min rounded-md">
+            <input
+              id="approved"
+              name="approved"
+              type="checkbox"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="approved-error"
+              defaultChecked={event.approved}
+            />
+          </div>
+          <div id="approved-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.approved &&
+              state.errors.approved.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
         </div>
         <div aria-live="polite" aria-atomic="true">
           {state.message ? (

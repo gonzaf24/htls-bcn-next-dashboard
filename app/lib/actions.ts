@@ -792,7 +792,6 @@ export async function updateEvent(prevState: EventState, formData: FormData) {
   };
 
   if (!validatedFields.success) {
-    console.log('validatedFields', validatedFields);
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Missing Fields. Failed to Update Event.',

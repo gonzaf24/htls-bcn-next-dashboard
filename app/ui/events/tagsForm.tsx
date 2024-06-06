@@ -34,8 +34,6 @@ export default function TagsForm({
     }
   }, [tags]);
 
-  console.log('mmmm', selectedTagsGroup1);
-
   useEffect(() => {
     const filteredTags = selectedTags.filter((tag) => tag.trim() !== '');
     setSelectedTags(filteredTags);
