@@ -50,6 +50,10 @@ export const mapEventsDataToEvents = (eventsData: any): EventsTable => ({
     .toString()
     .split(',')
     .map((tag: string) => tag.trim()),
+  priority: eventsData.priority,
+  locationName: eventsData.location_name,
+  locationAddress: eventsData.location_address,
+  locationGooglemapsLink: eventsData.location_googlemaps_link,
   free: eventsData.free,
   price: eventsData.price,
   ticketsLink: eventsData.tickets_link,

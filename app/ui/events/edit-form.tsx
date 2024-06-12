@@ -113,9 +113,9 @@ export default function Form({ event }: { event: EventsTable }) {
 
   return (
     <form onSubmit={handleSubmit} id="update-event-form">
-      <div className="rounded-md bg-gray-50 p-4 md:p-6">
+      <div className="flex flex-col gap-4 rounded-md bg-gray-50 p-4 md:p-6">
         {/* Event Id */}
-        <div className="mb-4">
+        <div className="">
           <label
             htmlFor="id"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
@@ -145,7 +145,7 @@ export default function Form({ event }: { event: EventsTable }) {
           </div>
         </div>
         {/* Date start */}
-        <div className="mb-4">
+        <div className="">
           <label
             htmlFor="date_start"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
@@ -172,7 +172,7 @@ export default function Form({ event }: { event: EventsTable }) {
           </div>
         </div>
         {/* Date end */}
-        <div className="mb-4">
+        <div className="">
           <label
             htmlFor="date_end"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
@@ -200,7 +200,7 @@ export default function Form({ event }: { event: EventsTable }) {
           </div>
         </div>
         {/* Title */}
-        <div className="mb-4">
+        <div className="">
           <label
             htmlFor="title"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
@@ -228,7 +228,7 @@ export default function Form({ event }: { event: EventsTable }) {
           </div>
         </div>
         {/* Description es */}
-        <div className="mb-4">
+        <div className="">
           <label
             htmlFor="description_es"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
@@ -255,7 +255,7 @@ export default function Form({ event }: { event: EventsTable }) {
           </div>
         </div>
         {/* Description en */}
-        <div className="mb-4">
+        <div className="">
           <label
             htmlFor="description_en"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
@@ -282,14 +282,14 @@ export default function Form({ event }: { event: EventsTable }) {
           </div>
         </div>
         {/* Its free */}
-        <div className="mb-4">
+        <div className="flex items-center justify-start gap-4">
           <label
             htmlFor="free"
-            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+            className="block w-min whitespace-nowrap text-sm font-medium"
           >
             Free
           </label>
-          <div className="relative mt-2 w-min rounded-md">
+          <div className="w-min">
             <input
               id="free"
               name="free"
@@ -309,7 +309,7 @@ export default function Form({ event }: { event: EventsTable }) {
           </div>
         </div>
         {/* Price */}
-        <div className="mb-4">
+        <div className="">
           <label
             htmlFor="price"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
@@ -338,7 +338,7 @@ export default function Form({ event }: { event: EventsTable }) {
           </div>
         </div>
         {/* Tickets Link */}
-        <div className="mb-4">
+        <div className="">
           <label
             htmlFor="tickets_link"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
@@ -366,7 +366,7 @@ export default function Form({ event }: { event: EventsTable }) {
           </div>
         </div>
         {/* Instagram Link */}
-        <div className="mb-4">
+        <div className="">
           <label
             htmlFor="instagram_link"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
@@ -394,7 +394,7 @@ export default function Form({ event }: { event: EventsTable }) {
           </div>
         </div>
         {/* Official Link */}
-        <div className="mb-4">
+        <div className="">
           <label
             htmlFor="official_link"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
@@ -421,15 +421,198 @@ export default function Form({ event }: { event: EventsTable }) {
               ))}
           </div>
         </div>
+        {/* Location name */}
+        <div className="">
+          <label
+            htmlFor="location_name"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Location Name
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="location_name"
+              name="location_name"
+              type="text"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="location_name-error"
+              defaultValue={event.locationName}
+            />
+          </div>
+
+          <div id="location_name-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.location_name &&
+              state.errors.location_name.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* Location address */}
+        <div className="">
+          <label
+            htmlFor="location_address"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Location Address
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="location_address"
+              name="location_address"
+              type="text"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="location_address-error"
+              defaultValue={event.locationAddress}
+            />
+          </div>
+
+          <div
+            id="location_address-error"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {state.errors?.location_address &&
+              state.errors.location_address.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* Location googlemaps link */}
+        <div className="">
+          <label
+            htmlFor="location_googlemaps_link"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Location Googlemaps Link
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="location_googlemaps_link"
+              name="location_googlemaps_link"
+              type="text"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="location_googlemaps_link-error"
+              defaultValue={event.locationGooglemapsLink}
+            />
+          </div>
+
+          <div
+            id="location_googlemaps_link-error"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {state.errors?.location_googlemaps_link &&
+              state.errors.location_googlemaps_link.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* contact name */}
+        <div className="">
+          <label
+            htmlFor="contact_name"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Contact Name
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="contact_name"
+              name="contact_name"
+              type="text"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="contact_name-error"
+              defaultValue={event.contactName}
+            />
+          </div>
+
+          <div id="contact_name-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.contact_name &&
+              state.errors.contact_name.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* contact email */}
+        <div className="">
+          <label
+            htmlFor="contact_email"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Contact Email
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="contact_email"
+              name="contact_email"
+              type="email"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="contact_email-error"
+              defaultValue={event.contactEmail}
+            />
+          </div>
+
+          <div id="contact_email-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.contact_email &&
+              state.errors.contact_email.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* contact phone */}
+        <div className="">
+          <label
+            htmlFor="contact_phone"
+            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+          >
+            Contact Phone
+          </label>
+          <div className="relative mt-2 rounded-md">
+            <input
+              id="contact_phone"
+              name="contact_phone"
+              type="text"
+              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
+              aria-describedby="contact_phone-error"
+              defaultValue={event.contactPhone}
+            />
+          </div>
+
+          <div id="contact_phone-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.contact_phone &&
+              state.errors.contact_phone.map((error: string) => (
+                <p className="mt-2 text-sm text-red-500" key={error}>
+                  {error}
+                </p>
+              ))}
+          </div>
+        </div>
+        {/* tags */}
+        <div className="">
+          <TagsForm
+            setSelectedTags={setSelectedTags}
+            selectedTags={selectedTags}
+          />
+        </div>
         {/* Photos */}
-        <div className="mb-4">
+        <div className="flex flex-col gap-4">
           <label
             htmlFor="images"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
           >
             Photos
           </label>
-          <div className="relative mb-4 mt-2 flex w-full justify-between rounded-md">
+          <div className="flex w-full justify-between rounded-md">
             <input
               type="file"
               id="images"
@@ -463,17 +646,17 @@ export default function Form({ event }: { event: EventsTable }) {
             </div>
           </div>
           {/* Uploaded photos list */}
-          <div className="mb-4 flex flex-col gap-2">
+          <div className="flex">
             {uploadedPhotos &&
               uploadedPhotos.map((photo) => (
-                <div key={photo} className="flex justify-between gap-4">
-                  <p>{photo}</p>
-                  <div className="flex gap-4">
+                <div key={photo} className="flex w-full justify-between">
+                  <p className="w-full text-tiny">{photo}</p>
+                  <div className="flex w-full justify-end gap-4">
                     <img src={photo} alt="uploaded photo" className="w-20" />
                     <button
                       type="button"
                       onClick={() => deletePhoto(photo)}
-                      className="rounded-md border p-2 text-red-500 hover:bg-red-300 hover:text-white"
+                      className="h-min rounded-md border p-2 text-red-500 hover:bg-red-300 hover:text-white"
                     >
                       Delete
                     </button>
@@ -481,108 +664,47 @@ export default function Form({ event }: { event: EventsTable }) {
                 </div>
               ))}
           </div>
-
           {photosError && (
             <p className="mt-2 text-sm text-red-500">{photosError}</p>
           )}
         </div>
-        {/* contact name */}
-        <div className="mb-4">
+        {/* Priority */}
+        <div className="">
           <label
-            htmlFor="contact_name"
+            htmlFor="priority"
             className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
           >
-            Contact Name
+            Priority
           </label>
           <div className="relative mt-2 rounded-md">
             <input
-              id="contact_name"
-              name="contact_name"
-              type="text"
+              id="priority"
+              name="priority"
+              type="number"
               className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
-              aria-describedby="contact_name-error"
-              defaultValue={event.contactName}
+              aria-describedby="priority-error"
+              defaultValue={event.priority}
             />
           </div>
 
-          <div id="contact_name-error" aria-live="polite" aria-atomic="true">
-            {state.errors?.contact_name &&
-              state.errors.contact_name.map((error: string) => (
+          <div id="priority-error" aria-live="polite" aria-atomic="true">
+            {state.errors?.priority &&
+              state.errors.priority.map((error: string) => (
                 <p className="mt-2 text-sm text-red-500" key={error}>
                   {error}
                 </p>
               ))}
           </div>
-        </div>
-        {/* contact email */}
-        <div className="mb-4">
-          <label
-            htmlFor="contact_email"
-            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
-          >
-            Contact Email
-          </label>
-          <div className="relative mt-2 rounded-md">
-            <input
-              id="contact_email"
-              name="contact_email"
-              type="email"
-              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
-              aria-describedby="contact_email-error"
-              defaultValue={event.contactEmail}
-            />
-          </div>
-
-          <div id="contact_email-error" aria-live="polite" aria-atomic="true">
-            {state.errors?.contact_email &&
-              state.errors.contact_email.map((error: string) => (
-                <p className="mt-2 text-sm text-red-500" key={error}>
-                  {error}
-                </p>
-              ))}
-          </div>
-        </div>
-        {/* contact phone */}
-        <div className="mb-4">
-          <label
-            htmlFor="contact_phone"
-            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
-          >
-            Contact Phone
-          </label>
-          <div className="relative mt-2 rounded-md">
-            <input
-              id="contact_phone"
-              name="contact_phone"
-              type="text"
-              className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
-              aria-describedby="contact_phone-error"
-              defaultValue={event.contactPhone}
-            />
-          </div>
-
-          <div id="contact_phone-error" aria-live="polite" aria-atomic="true">
-            {state.errors?.contact_phone &&
-              state.errors.contact_phone.map((error: string) => (
-                <p className="mt-2 text-sm text-red-500" key={error}>
-                  {error}
-                </p>
-              ))}
-          </div>
-        </div>
-        {/* tags */}
-        <div className="mb-4">
-          <TagsForm setSelectedTags={setSelectedTags} tags={event.tags} />
         </div>
         {/* Active */}
-        <div className="mb-4">
+        <div className="flex items-center justify-start gap-4">
           <label
             htmlFor="active"
-            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+            className="block w-min whitespace-nowrap text-sm font-medium"
           >
             Active
           </label>
-          <div className="relative mt-2 w-min rounded-md">
+          <div className="w-min">
             <input
               id="active"
               name="active"
@@ -602,14 +724,14 @@ export default function Form({ event }: { event: EventsTable }) {
           </div>
         </div>
         {/* approved */}
-        <div className="mb-4">
+        <div className="flex items-center justify-start gap-4">
           <label
             htmlFor="approved"
-            className="mb-2 block w-min whitespace-nowrap text-sm font-medium"
+            className="block w-min whitespace-nowrap text-sm font-medium"
           >
             Approved
           </label>
-          <div className="relative mt-2 w-min rounded-md">
+          <div className="w-min">
             <input
               id="approved"
               name="approved"

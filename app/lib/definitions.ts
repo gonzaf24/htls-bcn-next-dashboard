@@ -74,6 +74,10 @@ export type EventsTable = {
   dateEnd: string;
   photos: string[];
   tags: string[];
+  priority: number;
+  locationName: string;
+  locationAddress: string;
+  locationGooglemapsLink: string;
   free: boolean;
   price: number;
   ticketsLink: string;

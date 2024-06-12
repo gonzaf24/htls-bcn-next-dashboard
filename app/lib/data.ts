@@ -47,6 +47,7 @@ const ITEMS_PER_PAGE = 6;
 
 export async function fetchPlacesPages(query: string) {
   noStore();
+
   try {
     const count = await sql`
   SELECT COUNT(*)
@@ -161,29 +162,13 @@ export async function fetchFilteredPlaces(query: string, currentPage: number) {
 
 export async function fetchFilteredEvents(query: string, currentPage: number) {
   noStore();
+  //console.log('fetchFilteredEvents');
+  //await new Promise((resolve) => setTimeout(resolve, 5000));
+
   const offset = (currentPage - 1) * ITEMS_PER_PAGE;
   try {
     const data = await sql<EventsTable>`
-        SELECT
-          e.id,
-          e.title,
-          e.description_en,
-          e.description_es,
-          e.date_start,
-          e.date_end,
-          e.photos,
-          e.tags,
-          e.free,
-          e.price,
-          e.approved,
-          e.tickets_link,
-          e.instagram_link,
-          e.official_link,
-          e.active,
-          e.contact_name,
-          e.contact_email,
-          e.contact_phone,
-          e.date
+        SELECT *
         FROM events e
         WHERE
           CAST(e.id AS TEXT) ILIKE ${`%${query}%`} OR
@@ -313,26 +298,7 @@ export async function fetchEvent(id: string) {
   noStore();
   try {
     const data = await sql<EventsTable>`
-      SELECT
-        e.id,
-        e.title,
-        e.description_en,
-        e.description_es,
-        e.date_start,
-        e.date_end,
-        e.photos,
-        e.tags,
-        e.free,
-        e.price,
-        e.approved,
-        e.tickets_link,
-        e.instagram_link,
-        e.official_link,
-        e.active,
-        e.contact_name,
-        e.contact_email,
-        e.contact_phone,
-        e.date
+      SELECT *
       FROM events e
       WHERE e.id=${id}
     `;

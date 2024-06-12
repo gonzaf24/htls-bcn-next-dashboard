@@ -1,38 +1,49 @@
 'use client';
 import React from 'react';
 import { Select, SelectItem, Chip } from '@nextui-org/react';
-import { tagsData } from './data.js';
 
 export default function Tags({
-  tags,
-  groupId,
+  selectedTags,
   setSelectedTags,
   groupName,
+  items,
 }: {
-  tags?: string[];
-  groupId?: number;
+  selectedTags: string[];
   setSelectedTags: any;
-  groupName?: string;
+  groupName: string;
+  items: { text: string }[];
 }) {
-  const filteredTags =
-    groupId !== undefined
-      ? tagsData.filter((tag) => tag.group === groupId)
-      : tagsData;
-  const tagsGroupName = groupName ? groupName : '';
+  const handleSelectionChange = (keys: Set<React.Key> | string) => {
+    let keysArray: string[];
+
+    if (typeof keys === 'string') {
+      keysArray = [keys];
+    } else if (keys instanceof Set) {
+      keysArray = Array.from(keys) as string[];
+    } else {
+      keysArray = [];
+    }
+
+    const addedTags = keysArray.filter((key) => !selectedTags.includes(key));
+    const removedTags = selectedTags.filter((tag) => !keysArray.includes(tag));
+
+    if (addedTags.length === 0 && removedTags.length === 0) return;
+    if (addedTags.length > 0) setSelectedTags([...selectedTags, ...addedTags]);
+    if (removedTags.length > 0)
+      setSelectedTags(selectedTags.filter((tag) => !removedTags.includes(tag)));
+  };
 
   return (
     <Select
-      items={filteredTags}
-      label={tagsGroupName}
-      defaultSelectedKeys={tags}
+      items={items}
+      label={groupName}
+      defaultSelectedKeys={selectedTags}
       variant="bordered"
       isMultiline={true}
       selectionMode="multiple"
       placeholder={'Selecciona tags'}
       labelPlacement="outside"
-      onSelectionChange={(items) => {
-        setSelectedTags(items);
-      }}
+      onSelectionChange={handleSelectionChange}
       classNames={{
         base: 'w-full',
         trigger: 'min-h-12 py-2',

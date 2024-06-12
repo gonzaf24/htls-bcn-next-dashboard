@@ -158,9 +158,9 @@ export type State = {
     title?: string[];
     date_start?: string[];
     date_end?: string[];
-    contact_name?: string[];
+    /* contact_name?: string[];
     contact_email?: string[];
-    contact_phone?: string[];
+    contact_phone?: string[]; */
   };
   message?: string | null;
 };
@@ -181,6 +181,10 @@ export type EventState = {
     official_link?: string[];
     instagram_link?: string[];
     tickets_link?: string[];
+    priority?: string[];
+    location_name?: string[];
+    location_address?: string[];
+    location_googlemaps_link?: string[];
     tags?: string[];
     active?: string[];
     approved?: string[];
@@ -583,8 +587,14 @@ export async function createEvent(prevState: EventState, formData: FormData) {
   const eventData = {
     tags: formData.getAll('tags') || '',
     free: formData.get('free') || (false as boolean),
-    price: formData.get('price') || '' || 0,
+    price: formData.get('price' || null) || 0,
     photos: formData.getAll('photos') || '',
+    priority: formData.get('priority') || 0,
+    location_name: formData.get('location_name' || '')?.toString(),
+    location_address: formData.get('location_address' || '')?.toString(),
+    location_googlemaps_link: formData
+      .get('location_googlemaps_link' || '')
+      ?.toString(),
     tickets_link: formData.get('tickets_link' || '')?.toString(),
     instagram_link: formData.get('instagram_link' || null)?.toString(),
     official_link: formData.get('official_link' || null)?.toString(),
@@ -614,6 +624,10 @@ export async function createEvent(prevState: EventState, formData: FormData) {
     instagram_link,
     official_link,
     photos,
+    priority,
+    location_name,
+    location_address,
+    location_googlemaps_link,
     tags,
     free,
     price,
@@ -629,6 +643,10 @@ export async function createEvent(prevState: EventState, formData: FormData) {
         date_end,
         photos,
         tags,
+        priority,
+        location_name,
+        location_address,
+        location_googlemaps_link,
         free,
         price,
         tickets_link,
@@ -646,6 +664,10 @@ export async function createEvent(prevState: EventState, formData: FormData) {
         ${date_end},
         ARRAY[${photos.map((url) => `${url}`).join(',')}]::text[],
         ARRAY[${tags.map((tag) => `${tag}`).join(',')}]::text[],
+        ${Number(priority)},
+        ${location_name},
+        ${location_address},
+        ${location_googlemaps_link},
         ${Boolean(free)},
         ${Number(price)},
         ${tickets_link},
@@ -785,6 +807,12 @@ export async function updateEvent(prevState: EventState, formData: FormData) {
     tags: formData.getAll('tags') || '',
     free: formData.get('free') || (false as boolean),
     price: formData.get('price') || '' || 0,
+    priority: formData.get('priority') || '' || 0,
+    location_name: formData.get('location_name' || '')?.toString(),
+    location_address: formData.get('location_address' || '')?.toString(),
+    location_googlemaps_link: formData
+      .get('location_googlemaps_link' || '')
+      ?.toString(),
     photos: formData.getAll('photos') || '',
     tickets_link: formData.get('tickets_link' || '')?.toString(),
     instagram_link: formData.get('instagram_link' || null)?.toString(),
@@ -815,6 +843,10 @@ export async function updateEvent(prevState: EventState, formData: FormData) {
     official_link,
     photos,
     tags,
+    priority,
+    location_name,
+    location_address,
+    location_googlemaps_link,
     free,
     price,
   } = eventData;
@@ -830,6 +862,10 @@ export async function updateEvent(prevState: EventState, formData: FormData) {
         date_end = ${date_end},
         photos = ARRAY[${photos.map((url) => `${url}`).join(',')}]::text[],
         tags = ARRAY[${tags.map((tag) => `${tag}`).join(',')}]::text[],
+        priority = ${Number(priority)},
+        location_name = ${location_name},
+        location_address = ${location_address},
+        location_googlemaps_link = ${location_googlemaps_link},
         free = ${Boolean(free)},
         price = ${Number(price)},
         tickets_link = ${tickets_link},
