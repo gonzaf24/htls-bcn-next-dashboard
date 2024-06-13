@@ -8,6 +8,7 @@ import { useFormState } from 'react-dom';
 import { useEffect, useState } from 'react';
 import { EventsTable } from '@/app/lib/definitions';
 import TagsForm from './tagsForm';
+import { formatDatesss } from '@/app/lib/utils';
 
 export default function Form({ event }: { event: EventsTable }) {
   const initialState = { message: null, errors: {} };
@@ -108,8 +109,22 @@ export default function Form({ event }: { event: EventsTable }) {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
-  const dateStart = event.dateStart ? formatDateTime(event.dateStart) : '';
-  const dateEnd = event.dateEnd ? formatDateTime(event.dateEnd) : '';
+
+  console.log('Original dateStart', event.dateStart);
+  console.log('Original dateEnd', event.dateEnd);
+
+  const dateStartA = event.dateStart ? formatDateTime(event.dateStart) : '';
+  const dateEndA = event.dateEnd ? formatDateTime(event.dateEnd) : '';
+
+  console.log('dateStartA', dateStartA);
+  console.log('dateEndA', dateEndA);
+
+  const dateStart = event.dateStart ? formatDatesss(event.dateStart) : '';
+  const dateEnd = event.dateEnd ? formatDatesss(event.dateEnd) : '';
+
+
+  console.log("prueba S " , dateStart);
+  console.log("prueba E " , dateEnd);
 
   return (
     <form onSubmit={handleSubmit} id="update-event-form">
