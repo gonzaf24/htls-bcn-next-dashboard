@@ -43,6 +43,8 @@ export const formatDateHourseMinutesToLocal = (
 };
 
 export const formatInputDate = (dateStr: string, locale: string = 'es-ES'): string => {
+  console.log( "date string " , dateStr);
+
   const datePart = formatDateToLocal(dateStr, locale);
   const hourPart = formatDateHourseMinutesToLocal(dateStr, locale);
   console.log("formatInputDate Part --- inicio ")
