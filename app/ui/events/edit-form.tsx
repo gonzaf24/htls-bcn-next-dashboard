@@ -99,11 +99,11 @@ export default function Form({ event }: { event: EventsTable }) {
     }
   }
 
-  console.log('Original dateStart: ', event.dateStart);
-  console.log('Original dateEnd: ', event.dateEnd);
+  console.log('Original dateStart: ', event?.dateStart);
+  console.log('Original dateEnd: ', event?.dateEnd);
 
-  const dateStart = formatInputDate(event.dateStart) ;
-  const dateEnd = formatInputDate(event.dateEnd);
+  const dateStart = formatInputDate(event?.dateStart) ;
+  const dateEnd = formatInputDate(event?.dateEnd);
 
   console.log('dateStart: ', dateStart);
   console.log('dateEnd: ', dateEnd);
@@ -238,7 +238,7 @@ export default function Form({ event }: { event: EventsTable }) {
               name="description_es"
               className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
               aria-describedby="description_es-error"
-              defaultValue={event.descriptionEs}
+              defaultValue={event?.descriptionEs}
             />
           </div>
 
@@ -265,7 +265,7 @@ export default function Form({ event }: { event: EventsTable }) {
               name="description_en"
               className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
               aria-describedby="description_en-error"
-              defaultValue={event.descriptionEn}
+              defaultValue={event?.descriptionEn}
             />
           </div>
 

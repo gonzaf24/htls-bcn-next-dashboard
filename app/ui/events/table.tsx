@@ -102,12 +102,12 @@ export default async function EventsTable({
                     {truncateText(event.descriptionEn, 100)}
                   </td>
                   <td className="px-4 py-3 text-left align-top text-sm">
-                    {formatDateToLocal(event.dateStart)} -{' '}
-                    {formatDateHourseMinutesToLocal(event.dateStart)}
+                    {formatDateToLocal(event?.dateStart)} -{' '}
+                    {formatDateHourseMinutesToLocal(event?.dateStart)}
                   </td>
                   <td className="px-4 py-3 text-left align-top text-sm">
-                    {formatDateToLocal(event.dateEnd)} -{' '}
-                    {formatDateHourseMinutesToLocal(event.dateEnd)}
+                    {formatDateToLocal(event?.dateEnd)} -{' '}
+                    {formatDateHourseMinutesToLocal(event?.dateEnd)}
                   </td>
                 </tr>
               ))}

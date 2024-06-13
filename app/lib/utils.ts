@@ -1,4 +1,4 @@
-'use client';
+
 
 const months: { [key: string]: string } = {
   'ene': '01',
