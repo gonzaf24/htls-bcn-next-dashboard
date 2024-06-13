@@ -99,8 +99,14 @@ export default function Form({ event }: { event: EventsTable }) {
     }
   }
 
-  const dateStart = event.dateStart ? formatInputDate(event.dateStart) : '';
-  const dateEnd = event.dateEnd ? formatInputDate(event.dateEnd) : '';
+  console.log('Original dateStart: ', event.dateStart);
+  console.log('Original dateEnd: ', event.dateEnd);
+
+  const dateStart = formatInputDate(event.dateStart) ;
+  const dateEnd = formatInputDate(event.dateEnd);
+
+  console.log('dateStart: ', dateStart);
+  console.log('dateEnd: ', dateEnd);
 
   return (
     <form onSubmit={handleSubmit} id="update-event-form">

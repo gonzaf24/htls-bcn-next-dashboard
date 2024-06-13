@@ -1,3 +1,5 @@
+'use client';
+
 const months: { [key: string]: string } = {
   'ene': '01',
   'feb': '02',
@@ -43,13 +45,28 @@ export const formatDateHourseMinutesToLocal = (
 export const formatInputDate = (dateStr: string, locale: string = 'es-ES'): string => {
   const datePart = formatDateToLocal(dateStr, locale);
   const hourPart = formatDateHourseMinutesToLocal(dateStr, locale);
+  console.log("formatInputDate Part --- inicio ")
+  console.log('datePart', datePart);
+  console.log('hourPart', hourPart);
+  console.log("formatInputDate Part --- fin ")
+
   // Convert datePart from '13 jun 2024' to '2024-06-13'
   const [day, monthName, year] = datePart.split(' ');
 
   const month = months[monthName.toLowerCase()];
   // Ensure hourPart has a leading zero if needed
   const [hours, minutes] = hourPart.split(':').map(part => part.padStart(2, '0'));
+  console.log("formatInputDate --- inicio ")
+  console.log('day', day);
+  console.log('month', month);
+  console.log('year', year);
+  console.log('hours', hours);
+  console.log('minutes', minutes);
+
   const formattedDate = `${year}-${month}-${day.padStart(2, '0')}T${hours}:${minutes}`;
+  console.log('formattedDate', formattedDate);
+  console.log("formatInputDate --- fin ")
+
   return formattedDate;
 };
 
