@@ -1,5 +1,3 @@
-
-
 const months: { [key: string]: string } = {
   'ene': '01',
   'feb': '02',
@@ -18,11 +16,7 @@ const months: { [key: string]: string } = {
 export const formatDateToLocal = (
   dateStr: string,
   locale: string = 'es-ES',
-  id: String = ''
 ) => {
-  if (id === '2bd7500b-ccdf-4b0f-b632-b10c418f783d') {
-    console.log("ÚLTIMA.ÚLTIMA formatDateToLocal " , dateStr);
-  }
   const date = new Date(dateStr);
   const options: Intl.DateTimeFormatOptions = {
     day: 'numeric',
@@ -36,11 +30,7 @@ export const formatDateToLocal = (
 export const formatDateHourseMinutesToLocal = (
   dateStr: string,
   locale: string = 'es-ES',
-  id: String = ''
 ) => {
-  if (id === '2bd7500b-ccdf-4b0f-b632-b10c418f783d') {
-    console.log("ÚLTIMA.ÚLTIMA formatDateHourseMinutesToLocal " , dateStr);
-  }
   const date = new Date(dateStr);
   const options: Intl.DateTimeFormatOptions = {
     hour: 'numeric',
@@ -51,32 +41,14 @@ export const formatDateHourseMinutesToLocal = (
 };
 
 export const formatInputDate = (dateStr: string, locale: string = 'es-ES'): string => {
-  console.log( "date string " , dateStr);
-
   const datePart = formatDateToLocal(dateStr, locale);
   const hourPart = formatDateHourseMinutesToLocal(dateStr, locale);
-  console.log("formatInputDate Part --- inicio ")
-  console.log('datePart', datePart);
-  console.log('hourPart', hourPart);
-  console.log("formatInputDate Part --- fin ")
-
   // Convert datePart from '13 jun 2024' to '2024-06-13'
   const [day, monthName, year] = datePart.split(' ');
-
   const month = months[monthName.toLowerCase()];
   // Ensure hourPart has a leading zero if needed
   const [hours, minutes] = hourPart.split(':').map(part => part.padStart(2, '0'));
-  console.log("formatInputDate --- inicio ")
-  console.log('day', day);
-  console.log('month', month);
-  console.log('year', year);
-  console.log('hours', hours);
-  console.log('minutes', minutes);
-
   const formattedDate = `${year}-${month}-${day.padStart(2, '0')}T${hours}:${minutes}`;
-  console.log('formattedDate', formattedDate);
-  console.log("formatInputDate --- fin ")
-
   return formattedDate;
 };
 
@@ -95,7 +67,6 @@ export const formatDatesss = (
   const formatter = new Intl.DateTimeFormat(locale, options);
   return formatter.format(date);
 };
-
 
 export const generatePagination = (currentPage: number, totalPages: number) => {
   // If the total number of pages is 7 or less,

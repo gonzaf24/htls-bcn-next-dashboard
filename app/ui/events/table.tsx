@@ -24,8 +24,6 @@ export default async function EventsTable({
     currentPage,
   )) as EventsTableDef[];
 
-  console.log('Eventoss ', events);
-
   return (
     <div className="mt-6 flow-root overflow-x-scroll">
       <div className="inline-block min-w-full align-middle">
@@ -103,12 +101,12 @@ export default async function EventsTable({
                     {truncateText(event.descriptionEn, 100)}
                   </td>
                   <td className="px-4 py-3 text-left align-top text-sm">
-                    {formatDateToLocal(event?.dateStart,undefined, event.id)} -{' '}
-                    {formatDateHourseMinutesToLocal(event?.dateStart,undefined, event.id)}
+                    {formatDateToLocal(event?.dateStart)} -{' '}
+                    {formatDateHourseMinutesToLocal(event?.dateStart)}
                   </td>
                   <td className="px-4 py-3 text-left align-top text-sm">
-                    {formatDateToLocal(event?.dateEnd, undefined,event.id)} -{' '}
-                    {formatDateHourseMinutesToLocal(event?.dateEnd, undefined,event.id)}
+                    {formatDateToLocal(event?.dateEnd)} -{' '}
+                    {formatDateHourseMinutesToLocal(event?.dateEnd)}
                   </td>
                 </tr>
               ))}

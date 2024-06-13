@@ -99,15 +99,6 @@ export default function Form({ event }: { event: EventsTable }) {
     }
   }
 
-  console.log('Original dateStart: ', event?.dateStart);
-  console.log('Original dateEnd: ', event?.dateEnd);
-
-  const dateStart = formatInputDate(event?.dateStart) ;
-  const dateEnd = formatInputDate(event?.dateEnd);
-
-  console.log('dateStart: ', dateStart);
-  console.log('dateEnd: ', dateEnd);
-
   return (
     <form onSubmit={handleSubmit} id="update-event-form">
       <div className="flex flex-col gap-4 rounded-md bg-gray-50 p-4 md:p-6">
@@ -156,7 +147,7 @@ export default function Form({ event }: { event: EventsTable }) {
               type="datetime-local"
               className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
               aria-describedby="date_start-error"
-              defaultValue={dateStart}
+              defaultValue={event?.dateStart}
             />
           </div>
           <div id="date_start-error" aria-live="polite" aria-atomic="true">
@@ -183,7 +174,7 @@ export default function Form({ event }: { event: EventsTable }) {
               type="datetime-local"
               className="peer block w-full rounded-md border border-gray-200 px-5 py-2 text-sm outline-2 placeholder:text-gray-500"
               aria-describedby="date_end-error"
-              defaultValue={dateEnd}
+              defaultValue={event?.dateEnd}
             />
           </div>
 
