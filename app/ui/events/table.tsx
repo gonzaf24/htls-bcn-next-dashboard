@@ -24,6 +24,8 @@ export default async function EventsTable({
     currentPage,
   )) as EventsTableDef[];
 
+  console.log(" eventsss ", events);
+
   return (
     <div className="mt-6 flow-root overflow-x-scroll">
       <div className="inline-block min-w-full align-middle">
