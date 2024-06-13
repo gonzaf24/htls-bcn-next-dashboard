@@ -2,13 +2,13 @@
 'use client';
 
 import Link from 'next/link';
+import TagsForm from './tagsForm';
 import { Button } from '@/app/ui/button';
+import { EventsTable } from '@/app/lib/definitions';
 import { updateEvent } from '@/app/lib/actions';
 import { useFormState } from 'react-dom';
+import { formatInputDate } from '@/app/lib/utils';
 import { useEffect, useState } from 'react';
-import { EventsTable } from '@/app/lib/definitions';
-import TagsForm from './tagsForm';
-import { formatDatesss } from '@/app/lib/utils';
 
 export default function Form({ event }: { event: EventsTable }) {
   const initialState = { message: null, errors: {} };
@@ -99,32 +99,8 @@ export default function Form({ event }: { event: EventsTable }) {
     }
   }
 
-  const formatDateTime = (dateString = '') => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
-  };
-
-
-  console.log('Original dateStart', event.dateStart);
-  console.log('Original dateEnd', event.dateEnd);
-
-  const dateStartA = event.dateStart ? formatDateTime(event.dateStart) : '';
-  const dateEndA = event.dateEnd ? formatDateTime(event.dateEnd) : '';
-
-  console.log('dateStartA', dateStartA);
-  console.log('dateEndA', dateEndA);
-
-  const dateStart = event.dateStart ? formatDatesss(event.dateStart) : '';
-  const dateEnd = event.dateEnd ? formatDatesss(event.dateEnd) : '';
-
-
-  console.log("prueba S " , dateStart);
-  console.log("prueba E " , dateEnd);
+  const dateStart = event.dateStart ? formatInputDate(event.dateStart) : '';
+  const dateEnd = event.dateEnd ? formatInputDate(event.dateEnd) : '';
 
   return (
     <form onSubmit={handleSubmit} id="update-event-form">

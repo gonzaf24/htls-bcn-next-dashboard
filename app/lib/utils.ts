@@ -1,3 +1,17 @@
+const months: { [key: string]: string } = {
+  'ene': '01',
+  'feb': '02',
+  'mar': '03',
+  'abr': '04',
+  'may': '05',
+  'jun': '06',
+  'jul': '07',
+  'ago': '08',
+  'sep': '09',
+  'oct': '10',
+  'nov': '11',
+  'dic': '12'
+};
 
 export const formatDateToLocal = (
   dateStr: string,
@@ -24,6 +38,19 @@ export const formatDateHourseMinutesToLocal = (
   };
   const formatter = new Intl.DateTimeFormat(locale, options);
   return formatter.format(date);
+};
+
+export const formatInputDate = (dateStr: string, locale: string = 'es-ES'): string => {
+  const datePart = formatDateToLocal(dateStr, locale);
+  const hourPart = formatDateHourseMinutesToLocal(dateStr, locale);
+  // Convert datePart from '13 jun 2024' to '2024-06-13'
+  const [day, monthName, year] = datePart.split(' ');
+
+  const month = months[monthName.toLowerCase()];
+  // Ensure hourPart has a leading zero if needed
+  const [hours, minutes] = hourPart.split(':').map(part => part.padStart(2, '0'));
+  const formattedDate = `${year}-${month}-${day.padStart(2, '0')}T${hours}:${minutes}`;
+  return formattedDate;
 };
 
 export const formatDatesss = (
