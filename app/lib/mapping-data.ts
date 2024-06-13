@@ -1,4 +1,5 @@
 import { EventsTable, PlacesTable } from './definitions';
+import { formatInputDate } from './utils';
 
 // Función para mapear los datos de un lugar a un objeto Place
 export const mapPlaceDataToPlace = (placeData: any): PlacesTable => ({
@@ -40,8 +41,8 @@ export const mapEventsDataToEvents = (eventsData: any): EventsTable => ({
   title: eventsData.title,
   descriptionEn: eventsData.description_en,
   descriptionEs: eventsData.description_es,
-  dateStart: eventsData.date_start,
-  dateEnd: eventsData.date_end,
+  dateStart: formatInputDate(eventsData.date_start),
+  dateEnd: formatInputDate(eventsData.date_end),
   photos: eventsData.photos
     .toString()
     .split(',')
