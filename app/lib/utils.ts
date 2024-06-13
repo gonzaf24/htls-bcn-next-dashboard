@@ -18,7 +18,11 @@ const months: { [key: string]: string } = {
 export const formatDateToLocal = (
   dateStr: string,
   locale: string = 'es-ES',
+  id: String = ''
 ) => {
+  if (id === '2bd7500b-ccdf-4b0f-b632-b10c418f783d') {
+    console.log("ÚLTIMA.ÚLTIMA formatDateToLocal " , dateStr);
+  }
   const date = new Date(dateStr);
   const options: Intl.DateTimeFormatOptions = {
     day: 'numeric',
@@ -32,7 +36,11 @@ export const formatDateToLocal = (
 export const formatDateHourseMinutesToLocal = (
   dateStr: string,
   locale: string = 'es-ES',
+  id: String = ''
 ) => {
+  if (id === '2bd7500b-ccdf-4b0f-b632-b10c418f783d') {
+    console.log("ÚLTIMA.ÚLTIMA formatDateHourseMinutesToLocal " , dateStr);
+  }
   const date = new Date(dateStr);
   const options: Intl.DateTimeFormatOptions = {
     hour: 'numeric',
