@@ -8,6 +8,8 @@ import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
 import { unstable_noStore as noStore } from 'next/cache';
 import { Category } from './definitions';
+import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
+import { parseISO } from 'date-fns';
 
 const FormCategorySchema = z.object({
   id: z.string().nonempty({
@@ -633,6 +635,22 @@ export async function createEvent(prevState: EventState, formData: FormData) {
     price,
   } = eventData;
 
+  // Convertir las fechas a la zona horaria de París
+  const timeZone = 'Europe/Paris';
+  const zonedStartDate = toZonedTime(parseISO(date_start), timeZone);
+  const zonedEndDate = toZonedTime(parseISO(date_end), timeZone);
+
+  const formattedStartDate = formatInTimeZone(
+    zonedStartDate,
+    timeZone,
+    "yyyy-MM-dd'T'HH:mm:ssXXX",
+  );
+  const formattedEndDate = formatInTimeZone(
+    zonedEndDate,
+    timeZone,
+    "yyyy-MM-dd'T'HH:mm:ssXXX",
+  );
+
   try {
     await sql`
       INSERT INTO events (
@@ -660,8 +678,8 @@ export async function createEvent(prevState: EventState, formData: FormData) {
         ${title},
         ${description_en},
         ${description_es},
-        ${date_start},
-        ${date_end},
+        ${formattedStartDate},
+        ${formattedEndDate},
         ARRAY[${photos.map((url) => `${url}`).join(',')}]::text[],
         ARRAY[${tags.map((tag) => `${tag}`).join(',')}]::text[],
         ${Number(priority)},
@@ -851,6 +869,22 @@ export async function updateEvent(prevState: EventState, formData: FormData) {
     price,
   } = eventData;
 
+  // Convertir las fechas a la zona horaria de París
+  const timeZone = 'Europe/Paris';
+  const zonedStartDate = toZonedTime(parseISO(date_start), timeZone);
+  const zonedEndDate = toZonedTime(parseISO(date_end), timeZone);
+
+  const formattedStartDate = formatInTimeZone(
+    zonedStartDate,
+    timeZone,
+    "yyyy-MM-dd'T'HH:mm:ssXXX",
+  );
+  const formattedEndDate = formatInTimeZone(
+    zonedEndDate,
+    timeZone,
+    "yyyy-MM-dd'T'HH:mm:ssXXX",
+  );
+
   try {
     await sql`
       UPDATE events
@@ -858,8 +892,8 @@ export async function updateEvent(prevState: EventState, formData: FormData) {
         title = ${title},
         description_en = ${description_en},
         description_es = ${description_es},
-        date_start = ${date_start},
-        date_end = ${date_end},
+        date_start = ${formattedStartDate},
+        date_end = ${formattedEndDate},
         photos = ARRAY[${photos.map((url) => `${url}`).join(',')}]::text[],
         tags = ARRAY[${tags.map((tag) => `${tag}`).join(',')}]::text[],
         priority = ${Number(priority)},

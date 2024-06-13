@@ -179,7 +179,7 @@ export async function fetchFilteredEvents(query: string, currentPage: number) {
           e.contact_name ILIKE ${`%${query}%`} OR
           e.contact_email ILIKE ${`%${query}%`} OR
           e.contact_phone ILIKE ${`%${query}%`}
-        ORDER BY e.date ASC
+        ORDER BY e.date_start ASC
         LIMIT ${ITEMS_PER_PAGE} OFFSET ${offset}
       `;
 
